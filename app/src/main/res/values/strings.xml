@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ProjectBullet</string>
+    <string name="hello_blank_fragment">This is the home page</string>
+    <string name="footer">Developed by Sam Newby</string>
+</resources>
