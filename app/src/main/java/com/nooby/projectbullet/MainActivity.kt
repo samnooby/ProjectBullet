@@ -16,7 +16,7 @@ const val KEY_CURRENT_PAGE = "key_page"
 
 class MainActivity : AppCompatActivity() {
 
-    private val mainData: MainData = MainData(title="ProjectBullet", date = "Another day")
+    private val mainData: MainData = MainData(title="ProjectBullet")
     private lateinit var binding: ActivityMainBinding
     private var currentPage: String = ""
 

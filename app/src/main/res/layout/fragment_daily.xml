@@ -6,6 +6,9 @@
         <variable
             name="MyApp"
             type="com.nooby.projectbullet.MainData" />
+        <variable
+            name="BulletViewModel"
+            type="com.nooby.projectbullet.BulletViewModel" />
     </data>
 
     <LinearLayout
@@ -26,7 +29,7 @@
             android:fontFamily="@font/merriweather_bold"
             android:textSize="20sp"
             android:textColor="@color/text_color_primary"
-            android:text="@={MyApp.date}"
+            android:text="@={BulletViewModel.currentDayName}"
             tools:text="Wed Dec 09"
             />
     </LinearLayout>
