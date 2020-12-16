@@ -23,7 +23,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="file:$USER_HOME$/Android/Sdk/icons/material/materialicons/horizontal_rule/baseline_horizontal_rule_24.xml" />
+                                      <entry key="url" value="file:$USER_HOME$/Android/Sdk/icons/material/materialicons/panorama_fish_eye/baseline_panorama_fish_eye_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -35,7 +35,7 @@
                           <map>
                             <entry key="color" value="423824" />
                             <entry key="opacityPercent" value="87" />
-                            <entry key="outputName" value="bullet_icon_note" />
+                            <entry key="outputName" value="bullet_icon_event" />
                           </map>
                         </option>
                       </PersistentState>

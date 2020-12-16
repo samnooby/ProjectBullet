@@ -90,7 +90,7 @@
                     />
 
                 <ImageButton
-                    android:id="@+id/imageButton2"
+                    android:id="@+id/btn_create_bullet"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"

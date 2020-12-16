@@ -30,7 +30,7 @@ class BulletAdapter: RecyclerView.Adapter<TextItemViewHolder>() {
     override fun onBindViewHolder(holder: TextItemViewHolder, position: Int) {
         //Tells recycle view how to set the element at each position
         val item = bullets[position]
-        holder.textView.text = item.name
+        holder.textView.text = item.message
     }
 
 }

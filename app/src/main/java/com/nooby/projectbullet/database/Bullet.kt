@@ -20,16 +20,13 @@ data class Bullet (
         val createDate: Date = Calendar.getInstance().time,
 
         @ColumnInfo(name = "bullet_date")
-        var bulletDate: Date,
-
-        @ColumnInfo(name = "name")
-        var name: String,
+        var bulletDate: Date = Calendar.getInstance().time,
 
         @ColumnInfo(name = "message")
-        var message: String,
+        var message: String = "",
 
         @ColumnInfo(name = "bullet_icon")
-        var BulletType: BulletType
+        var BulletType: BulletType = com.nooby.projectbullet.database.BulletType.NOTE
 )
 
 //Allows for storage of complex data types by converting them to primary types

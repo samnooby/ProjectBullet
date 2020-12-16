@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.PopupWindow
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -14,6 +16,7 @@ import com.nooby.projectbullet.BulletViewModelFactory
 import com.nooby.projectbullet.MainData
 import com.nooby.projectbullet.R
 import com.nooby.projectbullet.database.BulletDatabase
+import com.nooby.projectbullet.database.BulletType
 import com.nooby.projectbullet.databinding.FragmentDailyBinding
 
 class DailyFragment : Fragment() {
@@ -50,8 +53,13 @@ class DailyFragment : Fragment() {
         binding.dailyViewModel = dailyViewModel
         binding.lifecycleOwner = this
 
-        //Sets up the event listeners
-        val bulletTypeButton = binding.
+        //Set up event listeners
+        binding.btnBulletType.setOnClickListener{
+            setupPopup().showAsDropDown(binding.btnBulletType, 0, -425)
+        }
+        binding.btnCreateBullet.setOnClickListener {
+            binding.dailyViewModel?.createBullet(binding.txtAddBullet.text.toString())
+        }
 
         Log.i("DailyFragment", "DailyFragment created")
 
@@ -61,5 +69,38 @@ class DailyFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         Log.i("DailyFragment", "DailyFragment destroyed")
+    }
+
+    //setupPopup creates the popup that is showed when selecting a different bullet type
+    private fun setupPopup(): PopupWindow {
+        val window = PopupWindow(this.activity)
+        val view = layoutInflater.inflate(R.layout.bullet_type_menu, null)
+        window.contentView = view
+        window.isFocusable = true
+
+        //Sets up button event listeners
+        var currentButton = view.findViewById<ImageButton>(R.id.btn_bullet_type_note)
+        currentButton.setOnClickListener {
+            binding.dailyViewModel?.newBulletType = BulletType.NOTE
+            window.dismiss()
+        }
+        currentButton = view.findViewById<ImageButton>(R.id.btn_bullet_type_task)
+        currentButton.setOnClickListener {
+            binding.dailyViewModel?.newBulletType = BulletType.INCOMPLETETASK
+            window.dismiss()
+        }
+        currentButton = view.findViewById<ImageButton>(R.id.btn_bullet_type_complete)
+        currentButton.setOnClickListener {
+            binding.dailyViewModel?.newBulletType = BulletType.COMPLETETASK
+            window.dismiss()
+        }
+        currentButton = view.findViewById<ImageButton>(R.id.btn_bullet_type_event)
+        currentButton.setOnClickListener {
+            binding.dailyViewModel?.newBulletType = BulletType.EVENT
+            window.dismiss()
+        }
+
+        Log.i("DailyFragment", "Popup window created")
+        return window
     }
 }
