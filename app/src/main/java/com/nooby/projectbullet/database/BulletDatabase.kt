@@ -4,38 +4,39 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 
-@Database(entities = [Day::class], version = 1, exportSchema = false)
+//The class for the database containing the bullets
+@Database(entities = [Bullet::class], version = 1, exportSchema = false)
+@TypeConverters(Converters::class)
 abstract class BulletDatabase : RoomDatabase() {
 
-    abstract val dayDao: DayDao
+    abstract val bulletDatabaseDao: BulletDatabaseDao
 
+    //Allows for retrieval of the database without creating the class
     companion object {
 
-        //Volatile is never cached and all read and writes are done to main memory to
-        //make sure all threads update same object
+        //Initializes the instance
         @Volatile
         private var INSTANCE: BulletDatabase? = null
 
         fun getInstance(context: Context) : BulletDatabase {
-            //Confirms only one thread at a time enters this code
+            //Get the current instance or create a new one if none exist
             synchronized(this) {
                 var instance = INSTANCE
-
-                //Checks to see if instance has been created before or if it is the first
-                //thread accessing the database
+                //If database instance doesn't exist create a new database with the builder
                 if (instance == null) {
                     instance = Room.databaseBuilder(
-                        context.applicationContext,
-                        BulletDatabase::class.java,
-                        "bullet_database"
-                    )
-                        .fallbackToDestructiveMigration()
-                        .build()
+                            context.applicationContext,
+                            BulletDatabase::class.java,
+                            "bullet_database"
+                    ).fallbackToDestructiveMigration().build()
                     INSTANCE = instance
                 }
                 return instance
             }
         }
+
     }
+
 }

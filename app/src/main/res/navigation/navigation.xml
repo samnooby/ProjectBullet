@@ -4,26 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation"
     app:startDestination="@id/dailyFragment">
-
     <fragment
         android:id="@+id/dailyFragment"
-        android:name="com.nooby.projectbullet.DailyFragment"
-        android:label="DailyFragment"
-        tools:layout="@layout/fragment_daily">
+        android:name="com.nooby.projectbullet.daily.DailyFragment"
+        android:label="DailyFragment" >
         <action
-            android:id="@+id/action_homeFragment_to_aboutFragment2"
-            app:destination="@id/aboutFragment2" />
+            android:id="@+id/action_dailyFragment_to_aboutFragment2"
+            app:destination="@id/aboutFragment2"
+            app:popUpTo="@id/dailyFragment"
+            app:popUpToInclusive="false" />
     </fragment>
     <fragment
         android:id="@+id/aboutFragment2"
         android:name="com.nooby.projectbullet.AboutFragment"
-        android:label="AboutFragment"
-        tools:layout="@layout/fragment_about"
-        >
-        <action
-            android:id="@+id/action_aboutFragment2_to_homeFragment"
-            app:destination="@id/dailyFragment"
-            app:popUpTo="@id/dailyFragment"
-            />
-    </fragment>
+        android:label="AboutFragment" />
 </navigation>
