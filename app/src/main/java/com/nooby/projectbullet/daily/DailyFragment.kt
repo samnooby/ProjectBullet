@@ -73,7 +73,7 @@ class DailyFragment : Fragment() {
 
     //setupPopup creates the popup that is showed when selecting a different bullet type
     private fun setupPopup(): PopupWindow {
-        val window = PopupWindow(this.activity)
+        val window = PopupWindow(requireNotNull(this.activity))
         val view = layoutInflater.inflate(R.layout.bullet_type_menu, null)
         window.contentView = view
         window.isFocusable = true
@@ -82,21 +82,25 @@ class DailyFragment : Fragment() {
         var currentButton = view.findViewById<ImageButton>(R.id.btn_bullet_type_note)
         currentButton.setOnClickListener {
             binding.dailyViewModel?.newBulletType = BulletType.NOTE
+            binding.btnBulletType.setImageResource(R.drawable.bullet_icon_note)
             window.dismiss()
         }
         currentButton = view.findViewById<ImageButton>(R.id.btn_bullet_type_task)
         currentButton.setOnClickListener {
             binding.dailyViewModel?.newBulletType = BulletType.INCOMPLETETASK
+            binding.btnBulletType.setImageResource(R.drawable.bullet_icon_task)
             window.dismiss()
         }
         currentButton = view.findViewById<ImageButton>(R.id.btn_bullet_type_complete)
         currentButton.setOnClickListener {
             binding.dailyViewModel?.newBulletType = BulletType.COMPLETETASK
+            binding.btnBulletType.setImageResource(R.drawable.bullet_icon_complete)
             window.dismiss()
         }
         currentButton = view.findViewById<ImageButton>(R.id.btn_bullet_type_event)
         currentButton.setOnClickListener {
             binding.dailyViewModel?.newBulletType = BulletType.EVENT
+            binding.btnBulletType.setImageResource(R.drawable.bullet_icon_event)
             window.dismiss()
         }
 

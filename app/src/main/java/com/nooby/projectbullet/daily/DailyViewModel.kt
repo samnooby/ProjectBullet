@@ -13,8 +13,8 @@ import java.util.*
 
 //DailyViewModel keeps track of all data and updates live data
 class DailyViewModel(
-        val database: BulletDatabaseDao,
-        application: Application
+    private val database: BulletDatabaseDao,
+    application: Application
 ) : AndroidViewModel(application) {
 
     //Creates the list of all jobs to be run and stops all jobs if view model is destroyed
@@ -29,7 +29,7 @@ class DailyViewModel(
     //Current day and its bullets
     private var currentDayStart = Calendar.getInstance()
     private var currentDayEnd = Calendar.getInstance()
-    var bullets : LiveData<List<Bullet>> = MutableLiveData<List<Bullet>>()
+    var bullets = MutableLiveData<List<Bullet>>()
     var dayName = MutableLiveData<String>()
 
     var newBulletType = BulletType.NOTE
@@ -56,13 +56,13 @@ class DailyViewModel(
             Log.i("DailyViewModel", "Start ${currentDayStart.time.toString()} End ${currentDayEnd.time.toString()} ")
 
             //Gets the bullets for the first day
-            bullets = getBullets()
+            bullets.value = getBullets()
             Log.i("DailyViewModel", "Initialized day")
         }
     }
 
     //getBullets gets all the bullets between the start and end of the current day
-    private suspend fun getBullets(): LiveData<List<Bullet>> {
+    private suspend fun getBullets(): List<Bullet> {
         return withContext(Dispatchers.IO) {
             database.get(currentDayStart.time, currentDayEnd.time)
         }
@@ -75,7 +75,7 @@ class DailyViewModel(
             currentDayEnd.add(Calendar.DATE, numDays)
             dayName.value = currentDayStart.time.toString().dropLast(17)
 
-            bullets = getBullets()
+            bullets.value = getBullets()
             Log.i("DailyViewModel", "Moved $numDays days")
         }
     }
@@ -85,16 +85,16 @@ class DailyViewModel(
         uiScope.launch {
             Log.i("DailyViewModel", "Creating bullet")
             val newBullet = Bullet(message = message, bulletDate = currentDayStart.time, BulletType = newBulletType)
-            bullets = addBullet(newBullet)
+            addBullet(newBullet)
+            bullets.value = getBullets()
             Log.i("DailyViewModel", "Successfully added bullet")
         }
     }
 
     //Adds the bullet to the database and resets the current bullets
-    private suspend fun addBullet(bullet: Bullet): LiveData<List<Bullet>> {
+    private suspend fun addBullet(bullet: Bullet): List<Long> {
         return withContext(Dispatchers.IO) {
-            database.insert(bullet)
-            database.get(currentDayStart.time, currentDayEnd.time)
+            database.insertAll(listOf(bullet))
         }
     }
 }
