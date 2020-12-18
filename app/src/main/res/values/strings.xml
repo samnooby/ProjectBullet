@@ -6,4 +6,5 @@
     <string name="menu_daily">Daily</string>
     <string name="menu_about">About</string>
     <string name="hint_new_bullet">Add new bullet</string>
+    <string name="btn_cancel">Cancel</string>
 </resources>

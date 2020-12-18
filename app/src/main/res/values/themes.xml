@@ -3,5 +3,6 @@
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary</item>
         <item name="colorAccent">@color/primary</item>
+        <item name="android:textColorHint">@color/text_color_primary</item>
     </style>
 </resources>

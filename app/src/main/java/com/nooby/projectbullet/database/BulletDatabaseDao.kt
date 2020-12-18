@@ -24,4 +24,7 @@ interface BulletDatabaseDao {
 
     @Query("SELECT * FROM bullet_table")
     fun getAllBullets() : List<Bullet>
+
+    @Query("DELETE FROM bullet_table")
+    fun clear()
 }

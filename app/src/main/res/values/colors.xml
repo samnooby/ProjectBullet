@@ -9,5 +9,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="primary">#ff5a54</color>
     <color name="text_color_primary">#423824</color>
+    <color name="text_hint_primary">#c2cacc</color>
     <color name="background_primary">#f7faff</color>
+    <color name="background_text">#ebeef2</color>
+    <color name="background_bullets">#fffff5</color>
 </resources>

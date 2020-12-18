@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    >
 
     <data>
         <variable
             name="MyApp"
             type="com.nooby.projectbullet.MainData" />
     </data>
-
-    <androidx.drawerlayout.widget.DrawerLayout
-        android:id="@+id/drawerLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
     <RelativeLayout
     android:layout_width="match_parent"
@@ -38,9 +34,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="#00FFFFFF"
-            app:srcCompat="@drawable/ic_baseline_menu_24"
-            android:padding="10dp"
-            />
+            android:padding="@dimen/padding_standard"
+            android:visibility="invisible"
+            app:srcCompat="@drawable/menu_icon" />
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/host_fragment"
@@ -69,14 +65,5 @@
                 android:textAlignment="center"
                 />
         </LinearLayout>
-
     </RelativeLayout>
-        <com.google.android.material.navigation.NavigationView
-            android:id="@+id/nav_view"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            app:menu="@menu/navdrawer_menu"
-            />
-    </androidx.drawerlayout.widget.DrawerLayout>
 </layout>

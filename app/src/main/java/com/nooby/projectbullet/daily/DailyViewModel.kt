@@ -33,7 +33,6 @@ class DailyViewModel(
     var dayName = MutableLiveData<String>()
 
     var newBulletType = BulletType.NOTE
-    var newBulletDate = Calendar.getInstance().time
 
     init {
         initializeFirstDay()
@@ -68,6 +67,26 @@ class DailyViewModel(
         }
     }
 
+    //Adds the bullet to the database and resets the current bullets
+    private suspend fun addBullet(bullet: Bullet) {
+        return withContext(Dispatchers.IO) {
+            database.insert(bullet)
+        }
+    }
+
+    //updateBullet updates the bullet in the database
+    private suspend fun updateBullet(bullet: Bullet) {
+        return withContext(Dispatchers.IO) {
+            database.update(bullet)
+        }
+    }
+
+    private suspend fun removeBullet(bullet: Bullet) {
+        return withContext(Dispatchers.IO) {
+            database.deleteBullet(bullet)
+        }
+    }
+
     //moveDay moves the current day numDays forward (Can be negative)
     fun moveDay(numDays: Int) {
         uiScope.launch {
@@ -91,10 +110,43 @@ class DailyViewModel(
         }
     }
 
-    //Adds the bullet to the database and resets the current bullets
-    private suspend fun addBullet(bullet: Bullet): List<Long> {
-        return withContext(Dispatchers.IO) {
-            database.insertAll(listOf(bullet))
+    //goToToday sets the current day to the date set on the phones calendar
+    fun goToToday() {
+        uiScope.launch {
+            //Sets the start and end of the day
+            currentDayStart = Calendar.getInstance()
+            currentDayEnd = Calendar.getInstance()
+            currentDayStart.set(Calendar.HOUR_OF_DAY, 0)
+            currentDayStart.set(Calendar.MINUTE, 0)
+            currentDayStart.set(Calendar.SECOND, 0)
+            currentDayStart.set(Calendar.MILLISECOND, 0)
+            currentDayEnd.set(Calendar.HOUR_OF_DAY, 23)
+            currentDayEnd.set(Calendar.MINUTE, 59)
+            currentDayEnd.set(Calendar.SECOND, 59)
+            currentDayEnd.set(Calendar.MILLISECOND, 99)
+            dayName.value = currentDayStart.time.toString().dropLast(17)
+
+            bullets.value = getBullets()
+        }
+    }
+
+    //changeBullet updates the bullet and refreshes the list
+    fun changeBullet(bullet: Bullet) {
+        uiScope.launch {
+            updateBullet(bullet)
+            bullets.value = getBullets()
+
+            Log.i("DailyViewModel", "Successfully updated bullet")
+        }
+    }
+
+    //DeleteBullet removes the bullet from the database and refreshes the list
+    fun deleteBullet(bullet: Bullet) {
+        uiScope.launch {
+            removeBullet(bullet)
+
+            bullets.value = getBullets()
+            Log.i("DailyViewModel", "Successfully deleted bullet")
         }
     }
 }

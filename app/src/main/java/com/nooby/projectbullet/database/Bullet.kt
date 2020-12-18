@@ -14,7 +14,7 @@ enum class BulletType {
 @Entity(tableName = "bullet_table")
 data class Bullet (
         @PrimaryKey(autoGenerate = true)
-        var bulledId: Long = 0,
+        var bulletId: Long = 0,
 
         @ColumnInfo(name = "create_date")
         val createDate: Date = Calendar.getInstance().time,
