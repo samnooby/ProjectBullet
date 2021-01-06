@@ -70,7 +70,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_small"
-        android:paddingTop="10dp"
+        android:paddingTop="15dp"
         android:fontFamily="@font/merriweather_bold"
         android:src="@android:drawable/ic_menu_close_clear_cancel"
         android:tint="#B21B1D"
@@ -80,6 +80,7 @@
         app:layout_constraintTop_toBottomOf="@+id/edit_bullet_type" />
 
     <View
+        android:id="@+id/view"
         android:layout_width="0dp"
         android:layout_height="@dimen/divider_width"
         android:layout_marginStart="@dimen/margin_small"

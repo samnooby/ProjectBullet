@@ -3,20 +3,24 @@ package com.nooby.projectbullet.daily
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.nooby.projectbullet.database.Bullet
 import com.nooby.projectbullet.database.BulletDatabaseDao
 import com.nooby.projectbullet.database.BulletType
 import kotlinx.coroutines.*
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 data class Day(
     val name: String,
     var bullets: MutableLiveData<List<Bullet>>,
-    val dayStart: Date,
-    val dayEnd: Date
+    val dayStart: LocalDateTime,
+    val dayEnd: LocalDateTime
 )
+
+const val PAGE_LIMIT = 151
 
 //DailyViewModel keeps track of all data and updates live data
 class DailyViewModel(
@@ -34,98 +38,57 @@ class DailyViewModel(
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
     var currentWeek = MutableLiveData<List<Day>>()
-    private var currentDay = 0
+    private var currentDay = LocalDate.now()
     var currentWeekNumber = 0
+    private val bulletFormatter = DateTimeFormatter.ofPattern("EEEE LLLL dd, yyyy")
 
     var newBulletType = BulletType.NOTE
 
     init {
-        GetWeek(0)
+        getWeek()
     }
 
     //GetWeek updates the list of current days to the new week
-    fun GetWeek(numWeek: Int) {
+    fun getWeek(numWeek: Int = 0, newCurrentDay: LocalDate? = null) {
         uiScope.launch {
             Log.i("DailyViewModel", "Changing week to $numWeek")
-            //Gets the time for the start of the week
-            val newCurrentDayStart = Calendar.getInstance()
-            val newCurrentDayEnd = Calendar.getInstance()
+            if (newCurrentDay != null) {
+                currentDay = newCurrentDay
+            }
+            //Gets the time for the start and end of first page
+            var dayStart = currentDay.atStartOfDay()
+            dayStart = dayStart.plusDays((numWeek* PAGE_LIMIT - PAGE_LIMIT/2).toLong())
             currentWeekNumber = numWeek
-            newCurrentDayStart.set(Calendar.HOUR_OF_DAY, 0)
-            newCurrentDayStart.set(Calendar.MINUTE, 0)
-            newCurrentDayStart.set(Calendar.SECOND, 0)
-            newCurrentDayStart.set(Calendar.MILLISECOND, 0)
-            newCurrentDayStart.set(Calendar.DAY_OF_WEEK, newCurrentDayStart.firstDayOfWeek)
-            newCurrentDayStart.add(Calendar.WEEK_OF_YEAR, currentWeekNumber)
-            newCurrentDayStart.add(Calendar.DATE, -1)
+            var dayEnd = dayStart.plusMinutes((11*60) + 59)
+            Log.i("DailyViewModel", "Start is $dayStart, end is $dayEnd")
 
-            newCurrentDayEnd.time = newCurrentDayStart.time
-            newCurrentDayEnd.set(Calendar.HOUR_OF_DAY, 23)
-            newCurrentDayEnd.set(Calendar.MINUTE, 59)
-            newCurrentDayEnd.set(Calendar.SECOND, 59)
-            newCurrentDayEnd.set(Calendar.MILLISECOND, 99)
+            //Adds all the days in the page list and get their bullets from the database
+            var daysList = mutableListOf<Day>()
 
-            val tmpList = mutableListOf<Day>()
-            //Goes through each day in the week and adds it to the current week list
-            for (i in 1..9) {
-                tmpList.add(
-                    Day(
-                        name = newCurrentDayStart.time.toString().dropLast(17),
-                        bullets = MutableLiveData<List<Bullet>>(
-                            getBullets(
-                                newCurrentDayStart.time,
-                                newCurrentDayEnd.time
-                            )
-                        ),
-                        dayStart = newCurrentDayStart.time,
-                        dayEnd = newCurrentDayEnd.time
-                    )
-                )
-                newCurrentDayStart.add(Calendar.DATE, 1)
-                newCurrentDayEnd.add(Calendar.DATE, 1)
+            for (day in 1..(PAGE_LIMIT+2)) {
+                daysList.add(Day(
+                    dayStart.format(bulletFormatter),
+                    MutableLiveData(getBullets(dayStart, dayEnd)),
+                    dayStart,
+                    dayEnd
+                ))
+                dayStart = dayStart.plusDays(1)
+                dayEnd = dayEnd.plusDays(1)
             }
+            Log.i("DailyViewModel", "Start is $dayStart, end is $dayEnd")
 
-            currentWeek.value = tmpList
+            currentWeek.value = daysList
         }
     }
-
-    //UpdateDay gets the bullets for the current day from the database and updates the value
-    fun updateDay() {
-        uiScope.launch {
-            //Updates the current days bullets
-            if (currentWeek.value != null) {
-                val tmpList = currentWeek.value!!
-                val tmpDay = tmpList[currentDay]
-                tmpDay.bullets.value = getBullets(tmpDay.dayStart, tmpDay.dayEnd)
-                for (day in tmpList) {
-                    Log.i("DailyViewModel", "$day tm: 1${day.bullets.value}")
-                }
-                currentWeek.value?.get(currentDay).let {
-                    if (it != null) {
-                        it.bullets.value = getBullets(it.dayStart, it.dayEnd)
-                        Log.i("DailyViewModel", "Updating day ${it.bullets.value}")
-                    }
-                }
-            }
-        }
-    }
-
     //getBullets gets all the bullets between the start and end of the current day
-    private suspend fun getBullets(dayStart: Date, dayEnd: Date): List<Bullet> {
+    private suspend fun getBullets(dayStart: LocalDateTime, dayEnd: LocalDateTime): List<Bullet> {
         return withContext(Dispatchers.IO) {
             database.get(dayStart, dayEnd)
         }
     }
 
-    private fun getBulletDay(bullet: Bullet): Pair<Date, Date> {
-        val newCal = Calendar.getInstance()
-        newCal.time = bullet.bulletDate
-        newCal.set(Calendar.HOUR_OF_DAY, 23)
-        newCal.set(Calendar.MINUTE, 59)
-        newCal.set(Calendar.SECOND, 59)
-        newCal.set(Calendar.MILLISECOND, 99)
-
-        val newDate = newCal.time
+    private fun getBulletDay(bullet: Bullet): Pair<LocalDateTime, LocalDateTime> {
+        val newDate = bullet.bulletDate.plusMinutes((11*60) + 59)
         Log.i("DailyViewModel","Got bullet day ${bullet.bulletDate}, $newDate")
         return Pair(bullet.bulletDate, newDate)
     }
@@ -166,7 +129,7 @@ class DailyViewModel(
                 val newBullet = Bullet(
                     message = message,
                     bulletDate = tmpDay.dayStart,
-                    BulletType = newBulletType
+                    bulletType = newBulletType
                 )
                 currentWeek.value!![day].bullets.value = addBullet(newBullet)
                 Log.i("DailyViewModel", "Successfully added bullet")

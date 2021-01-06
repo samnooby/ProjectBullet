@@ -8,18 +8,21 @@ import android.util.Log
 import android.widget.*
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.LifecycleOwner
+import com.nooby.projectbullet.DatePicker
 import com.nooby.projectbullet.R
 import com.nooby.projectbullet.database.Bullet
 import com.nooby.projectbullet.database.BulletType
+import kotlinx.android.synthetic.main.bullet_edit_view.*
 import java.lang.ClassCastException
 import java.lang.IllegalStateException
+import java.time.LocalDateTime
 import java.util.*
 
 class BulletEditMenu(val bullet: Bullet, private val lifecycleOwner: LifecycleOwner): DialogFragment() {
 
-    var bulletType: BulletType = bullet.BulletType
+    var bulletType: BulletType = bullet.bulletType
     var bulletText: String = bullet.message
-    var bulletDate: Date = bullet.bulletDate
+    var bulletDate: LocalDateTime = bullet.bulletDate
     var deleteBullet: Boolean = false
     var isEdit: Boolean = false
 
@@ -33,8 +36,8 @@ class BulletEditMenu(val bullet: Bullet, private val lifecycleOwner: LifecycleOw
 
     //Creates the dialog with the given view
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return activity?.let {
-            val builder = AlertDialog.Builder(it)
+        return activity?.let { frag ->
+            val builder = AlertDialog.Builder(frag)
             val inflater = requireActivity().layoutInflater
 
             //Sets up the view and the default values
@@ -42,7 +45,7 @@ class BulletEditMenu(val bullet: Bullet, private val lifecycleOwner: LifecycleOw
             messageView = view.findViewById(R.id.edit_txt_bullet)
             messageView.setText(bullet.message)
             typeView = view.findViewById(R.id.edit_bullet_type)
-            typeView.setImageResource(when (bullet.BulletType){
+            typeView.setImageResource(when (bullet.bulletType){
                 BulletType.NOTE -> R.drawable.bullet_icon_note
                 BulletType.INCOMPLETETASK -> R.drawable.bullet_icon_task
                 BulletType.COMPLETETASK -> R.drawable.bullet_icon_complete
@@ -65,6 +68,13 @@ class BulletEditMenu(val bullet: Bullet, private val lifecycleOwner: LifecycleOw
                 isEdit = false
                 messageView.setText(bullet.message)
                 this.dismiss()
+            }
+            view.findViewById<ImageButton>(R.id.edit_bullet_day).setOnClickListener {
+                DatePicker {
+                    bulletDate = it.atStartOfDay()
+                    isEdit = true
+                    Log.i("BulletEditMenu", "Got day $bulletDate")
+                }.show(parentFragmentManager, "Day")
             }
             builder.setView(view)
             builder.create()

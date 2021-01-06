@@ -11,7 +11,7 @@ import com.nooby.projectbullet.database.BulletType
 @BindingAdapter("bulletImage")
 fun ImageView.setBulletImage(item: Bullet?) {
     item?.let {
-        setImageResource(when (item.BulletType) {
+        setImageResource(when (item.bulletType) {
             BulletType.NOTE -> R.drawable.bullet_icon_note
             BulletType.INCOMPLETETASK -> R.drawable.bullet_icon_task
             BulletType.COMPLETETASK -> R.drawable.bullet_icon_complete

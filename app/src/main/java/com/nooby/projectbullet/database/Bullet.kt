@@ -4,6 +4,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 //BulletType is the different types of bullets the user can create
@@ -12,34 +14,35 @@ enum class BulletType {
 }
 
 @Entity(tableName = "bullet_table")
-data class Bullet (
+data class Bullet(
         @PrimaryKey(autoGenerate = true)
         var bulletId: Long = 0,
 
         @ColumnInfo(name = "create_date")
-        val createDate: Date = Calendar.getInstance().time,
+        val createDate: LocalDateTime = LocalDateTime.now(),
 
         @ColumnInfo(name = "bullet_date")
-        var bulletDate: Date = Calendar.getInstance().time,
+        var bulletDate: LocalDateTime = LocalDateTime.now(),
 
         @ColumnInfo(name = "message")
         var message: String = "",
 
         @ColumnInfo(name = "bullet_icon")
-        var BulletType: BulletType = com.nooby.projectbullet.database.BulletType.NOTE
+        var bulletType: BulletType = com.nooby.projectbullet.database.BulletType.NOTE
 )
 
 //Allows for storage of complex data types by converting them to primary types
 class Converters {
+        private val formatter = DateTimeFormatter.ofPattern("EEEE LLLL dd, yyyy HH:mm:ss")
         //Converts a long to a date
         @TypeConverter
-        fun fromTimeStamp(value: Long?): Date? {
-                return value?.let { Date(it)}
+        fun fromTimeStamp(value: String?): LocalDateTime? {
+                return value?.let { LocalDateTime.parse(value, formatter) }
         }
         //Converts day to long
         @TypeConverter
-        fun toTimeStamp(date: Date?): Long? {
-                return date?.time?.toLong()
+        fun toTimeStamp(date: LocalDateTime?): String? {
+                return date?.format(formatter)
         }
 
         //Converts bullet type to int

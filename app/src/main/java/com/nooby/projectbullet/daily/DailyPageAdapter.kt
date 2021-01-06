@@ -76,8 +76,8 @@ class DailyPagerCallback(private val listener: (Int) -> Unit) : ViewPager2.OnPag
         super.onPageSelected(position)
         Log.i("PageAdapter", "Checking page number got $position")
         when(position) {
-            0 -> listener.invoke(7)
-            8 -> listener.invoke(1)
+            0 -> listener.invoke(PAGE_LIMIT)
+            PAGE_LIMIT+1 -> listener.invoke(1)
         }
     }
 }

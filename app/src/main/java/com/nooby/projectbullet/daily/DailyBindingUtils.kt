@@ -12,6 +12,3 @@ fun TextView.setMessageText(item: Day) {
     }
 }
 
-@BindingAdapter("bulletList")
-fun RecyclerView.setItems(bullets: List<Bullet>) {
-}

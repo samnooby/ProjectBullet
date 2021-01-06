@@ -5,9 +5,10 @@ import android.app.Dialog
 import android.os.Bundle
 import android.widget.DatePicker
 import androidx.fragment.app.DialogFragment
+import java.time.LocalDate
 import java.util.*
 
-class DatePicker(private val listener: (Date) -> Unit): DialogFragment(), DatePickerDialog.OnDateSetListener {
+class DatePicker(private val listener: (LocalDate) -> Unit): DialogFragment(), DatePickerDialog.OnDateSetListener {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // Use the current date as the default date in the picker
@@ -21,11 +22,11 @@ class DatePicker(private val listener: (Date) -> Unit): DialogFragment(), DatePi
     }
 
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
-        val newDate = Calendar.getInstance()
-        newDate.set(Calendar.YEAR, year)
-        newDate.set(Calendar.MONTH, month)
-        newDate.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-        listener.invoke(newDate.time)
+        var newDate = LocalDate.now()
+        newDate = newDate.withYear(year)
+        newDate = newDate.withMonth(month + 1)
+        newDate = newDate.withDayOfMonth(dayOfMonth)
+        listener.invoke(newDate)
     }
 
 }

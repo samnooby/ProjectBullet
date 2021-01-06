@@ -2,6 +2,7 @@ package com.nooby.projectbullet.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import java.time.LocalDateTime
 import java.util.*
 
 @Dao
@@ -17,7 +18,7 @@ interface BulletDatabaseDao {
     fun update(bullet: Bullet)
 
     @Query("SELECT * FROM bullet_table WHERE bullet_date BETWEEN :startDay AND :endDay")
-    fun get(startDay: Date, endDay: Date): List<Bullet>
+    fun get(startDay: LocalDateTime, endDay: LocalDateTime): List<Bullet>
 
     @Delete
     fun deleteBullet(bullet: Bullet)
