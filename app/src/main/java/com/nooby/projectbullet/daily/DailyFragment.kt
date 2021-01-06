@@ -79,10 +79,12 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener {
                     Log.i("DailyFragment", "Going forward one week")
                     dailyViewModel.GetWeek(dailyViewModel.currentWeekNumber + 1)
                 }
-                binding.viewPager.setCurrentItem(it, true)
+                binding.viewPager.setCurrentItem(it, false)
             }
         }
         binding.viewPager.adapter = viewPageAdapter
+        Log.i("DailyFragment", "Got day ${Calendar.getInstance().get(Calendar.DAY_OF_WEEK)}")
+        binding.viewPager.setCurrentItem(Calendar.getInstance().get(Calendar.DAY_OF_WEEK), false)
         binding.viewPager.registerOnPageChangeCallback(dailyPagerCallback)
 
         //Binds the data to the layout
@@ -114,6 +116,21 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener {
         }
         binding.forwardDayBtn.setOnClickListener {
             binding.viewPager.setCurrentItem(binding.viewPager.currentItem + 1, true)
+        }
+        binding.dailyHomeBtn.setOnClickListener {
+            dailyViewModel.GetWeek(0)
+            binding.viewPager.setCurrentItem(Calendar.getInstance().get(Calendar.DAY_OF_WEEK), false)
+        }
+        binding.dailyDateBtn.setOnClickListener {
+            val datePicker = DatePicker {
+                val cal = Calendar.getInstance()
+                cal.set(Calendar.DAY_OF_WEEK, 0)
+                val timeSince = cal.time.time - it.time
+                val weeks = timeSince / 1000 / 60 / 60 / 24 / 7
+                Log.i("DailyFragment", "Got day $timeSince and week $weeks")
+
+            }
+            datePicker.show(parentFragmentManager, "datePicker")
         }
         binding.txtAddBullet.setOnKeyListener { _, keyCode, event ->
             when {

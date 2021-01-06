@@ -57,6 +57,7 @@ class DailyViewModel(
             newCurrentDayStart.set(Calendar.MILLISECOND, 0)
             newCurrentDayStart.set(Calendar.DAY_OF_WEEK, newCurrentDayStart.firstDayOfWeek)
             newCurrentDayStart.add(Calendar.WEEK_OF_YEAR, currentWeekNumber)
+            newCurrentDayStart.add(Calendar.DATE, -1)
 
             newCurrentDayEnd.time = newCurrentDayStart.time
             newCurrentDayEnd.set(Calendar.HOUR_OF_DAY, 23)
@@ -65,16 +66,8 @@ class DailyViewModel(
             newCurrentDayEnd.set(Calendar.MILLISECOND, 99)
 
             val tmpList = mutableListOf<Day>()
-            tmpList.add(
-                Day(
-                    name = "Start Day",
-                    bullets = MutableLiveData<List<Bullet>>(),
-                    dayStart = newCurrentDayStart.time,
-                    dayEnd = newCurrentDayEnd.time
-                )
-            )
             //Goes through each day in the week and adds it to the current week list
-            for (i in 1..7) {
+            for (i in 1..9) {
                 tmpList.add(
                     Day(
                         name = newCurrentDayStart.time.toString().dropLast(17),
@@ -91,15 +84,6 @@ class DailyViewModel(
                 newCurrentDayStart.add(Calendar.DATE, 1)
                 newCurrentDayEnd.add(Calendar.DATE, 1)
             }
-
-            tmpList.add(
-                Day(
-                    name = "Start Day",
-                    bullets = MutableLiveData<List<Bullet>>(),
-                    dayStart = newCurrentDayStart.time,
-                    dayEnd = newCurrentDayEnd.time
-                )
-            )
 
             currentWeek.value = tmpList
         }

@@ -70,6 +70,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_small"
+        android:paddingTop="10dp"
         android:fontFamily="@font/merriweather_bold"
         android:src="@android:drawable/ic_menu_close_clear_cancel"
         android:tint="#B21B1D"

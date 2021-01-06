@@ -14,30 +14,49 @@
             type="com.nooby.projectbullet.daily.DailyViewModel" />
     </data>
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/fragment_daily"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/txt_daily_title"
-            style="@style/title"
-            android:text="@={MyApp.title}"
-            tools:text="Daily Entries" />
-
         <ImageView
+            android:id="@+id/daily_home_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="@dimen/padding_standard"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/home_icon" />
+
+        <TextView
+            android:id="@+id/txt_daily_title"
+            style="@style/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@={MyApp.title}"
+            app:layout_constraintEnd_toStartOf="@+id/daily_date_btn"
+            app:layout_constraintStart_toEndOf="@+id/daily_home_btn"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Daily Entries" />
+
+        <ImageView
+            android:id="@+id/daily_date_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="9dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/date_icon" />
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewPager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/day_buttons"
-            android:layout_below="@id/txt_daily_title" />
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/day_buttons"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_daily_title" />
 
         <!--        <TextView-->
         <!--            android:id="@+id/txt_date"-->
@@ -68,9 +87,11 @@
             android:id="@+id/day_buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
             android:gravity="start"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
             <LinearLayout
                 android:id="@+id/add_new_bullet"
@@ -138,5 +159,5 @@
                     app:srcCompat="@drawable/next_icon" />
             </LinearLayout>
         </LinearLayout>
-    </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
