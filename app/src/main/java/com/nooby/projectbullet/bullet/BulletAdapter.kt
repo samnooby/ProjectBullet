@@ -1,17 +1,14 @@
 package com.nooby.projectbullet.bullet
 
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.nooby.projectbullet.database.Bullet
 import com.nooby.projectbullet.databinding.BulletItemViewBinding
 
 
-class BulletAdapter(val clickListener: BulletListener): RecyclerView.Adapter<BulletAdapter.ViewHolder>() {
+class BulletAdapter(private val clickListener: BulletListener) :
+    RecyclerView.Adapter<BulletAdapter.ViewHolder>() {
 
     //The list of items that is displayed by the recyclerview
     var bullets = listOf<Bullet>()
@@ -34,12 +31,13 @@ class BulletAdapter(val clickListener: BulletListener): RecyclerView.Adapter<Bul
     }
 
 
-    class ViewHolder private constructor(private val binding: BulletItemViewBinding): RecyclerView.ViewHolder(binding.root){
+    class ViewHolder private constructor(private val binding: BulletItemViewBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
         //bind prepares the view that is used
         fun bind(
-                item: Bullet,
-                clickListener: BulletListener
+            item: Bullet,
+            clickListener: BulletListener
         ) {
             binding.bullet = item
             binding.clickListener = clickListener
