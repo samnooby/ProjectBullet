@@ -37,7 +37,7 @@ class DailyPageAdapter(private val clickListener: DailyPageListener) :
                 BulletListener({ clickListener.onClick(it) },
                     { clickListener.onComplete(it) }, { bullet: Bullet, s: String ->
                         clickListener.onNote(bullet, s)
-                    })
+                    }, { bullet: Bullet, i: Int -> clickListener.onNoteEdit(bullet, i)})
             )
             //Adds an observer to the bullet adapter to update with livedata
             day.bullets.observe(itemView.context as LifecycleOwner, Observer {
@@ -90,9 +90,11 @@ class DailyPagerCallback(private val listener: (Int) -> Unit) : ViewPager2.OnPag
 class DailyPageListener(
     val clickListener: (bullet: Bullet) -> Unit,
     val taskListener: (bullet: Bullet) -> Unit,
-    val noteListener: (bullet:Bullet, note: String) -> Unit
+    val noteListener: (bullet: Bullet, note: String) -> Unit,
+    val editNoteListener: (bullet: Bullet, notePosition: Int) -> Unit
 ) {
     fun onClick(bullet: Bullet) = clickListener(bullet)
     fun onComplete(bullet: Bullet) = taskListener(bullet)
     fun onNote(bullet: Bullet, note: String) = noteListener(bullet, note)
+    fun onNoteEdit(bullet: Bullet, notePosition: Int) = editNoteListener(bullet, notePosition)
 }

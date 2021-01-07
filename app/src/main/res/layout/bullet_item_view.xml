@@ -108,7 +108,7 @@
                 android:background="@color/background_notes"
                 android:ems="10"
                 android:hint="Add new note"
-                android:inputType="textPersonName"
+                android:inputType="textCapSentences"
                 android:textColorHint="@color/text_hint_primary"
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"

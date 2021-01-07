@@ -1,5 +1,6 @@
 package com.nooby.projectbullet.bullet
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.opengl.Visibility
 import android.util.Log
@@ -40,13 +41,16 @@ class BulletAdapter(private val clickListener: BulletListener) :
         RecyclerView.ViewHolder(binding.root) {
 
         //bind prepares the view that is used
+        @SuppressLint("ClickableViewAccessibility")
         fun bind(
             item: Bullet,
             clickListener: BulletListener
         ) {
             binding.bullet = item
+            //Creates the gesture detector to lookout control note text box
             val gestureDetector =
                 GestureDetector(itemView.context, GestureListener() {
+                    //Show or hide dialog depending of if its already showing
                     when (it) {
                         0 -> {
                             if (binding.constraintLayout.visibility == View.GONE) {
@@ -64,6 +68,7 @@ class BulletAdapter(private val clickListener: BulletListener) :
                         }
                     }
                 })
+            //Sets up the touch and event listeners on the page
             binding.root.setOnTouchListener { _, event ->
                 gestureDetector.onTouchEvent(event)
             }
@@ -75,11 +80,6 @@ class BulletAdapter(private val clickListener: BulletListener) :
                 Log.i("BulletAdapter", "New note button clicked")
                 binding.newNoteTxt.clearFocus()
             }
-            binding.executePendingBindings()
-            Log.i("BulletAdapter", "Got bullet ${item.bulletNotes.size}")
-            val noteAdapter = BulletNoteAdapter()
-            noteAdapter.notes = item.bulletNotes
-            binding.bulletNoteList.adapter = noteAdapter
             binding.newNoteTxt.setOnFocusChangeListener { v, hasFocus ->
                 if (!hasFocus) {
                     binding.constraintLayout.visibility = View.GONE
@@ -89,6 +89,16 @@ class BulletAdapter(private val clickListener: BulletListener) :
                     }
                 }
             }
+
+            binding.executePendingBindings()
+            Log.i("BulletAdapter", "Got bullet ${item.bulletNotes.size}")
+            //The adapter for the list of notes on the page
+            val noteAdapter = BulletNoteAdapter(NoteListener {
+                clickListener.editNote(item, it)
+            })
+            noteAdapter.notes = item.bulletNotes
+            binding.bulletNoteList.adapter = noteAdapter
+
 
         }
 
@@ -101,6 +111,7 @@ class BulletAdapter(private val clickListener: BulletListener) :
             }
         }
 
+        //GestureListener objects control what happens on the page with each event
         private class GestureListener(
             val visibilityListener: (Int) -> (Unit)
         ) : GestureDetector.SimpleOnGestureListener() {
@@ -118,12 +129,15 @@ class BulletAdapter(private val clickListener: BulletListener) :
     }
 }
 
+//BulletListeners listen for events
 class BulletListener(
     val clickListener: (bullet: Bullet) -> Unit,
     val taskListener: (bullet: Bullet) -> Unit,
-    val noteListener: (bullet: Bullet, note: String) -> Unit
+    val noteListener: (bullet: Bullet, note: String) -> Unit,
+    val editNoteListener: (bullet: Bullet, notePosition: Int) -> Unit
 ) {
     fun onClick(bullet: Bullet) = clickListener(bullet)
     fun completeTask(bullet: Bullet) = taskListener(bullet)
     fun addNote(bullet: Bullet, note: String) = noteListener(bullet, note)
+    fun editNote(bullet: Bullet, notePosition: Int) = editNoteListener(bullet, notePosition)
 }

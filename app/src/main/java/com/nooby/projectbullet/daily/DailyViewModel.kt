@@ -20,7 +20,7 @@ data class Day(
     val dayEnd: LocalDateTime
 )
 
-const val PAGE_LIMIT = 151
+const val PAGE_LIMIT = 101
 
 //DailyViewModel keeps track of all data and updates live data
 class DailyViewModel(
@@ -45,11 +45,11 @@ class DailyViewModel(
     var newBulletType = BulletType.NOTE
 
     init {
-        getWeek()
+        getWeek(0)
     }
 
     //GetWeek updates the list of current days to the new week
-    fun getWeek(numWeek: Int = 0, newCurrentDay: LocalDate? = null) {
+    fun getWeek(numWeek: Int = currentWeekNumber, newCurrentDay: LocalDate? = null) {
         uiScope.launch {
             Log.i("DailyViewModel", "Changing week to $numWeek")
             if (newCurrentDay != null) {
@@ -129,8 +129,7 @@ class DailyViewModel(
                 val newBullet = Bullet(
                     message = message,
                     bulletDate = tmpDay.dayStart,
-                    bulletType = newBulletType,
-                    bulletNotes = listOf("This is a random note")
+                    bulletType = newBulletType
                 )
                 currentWeek.value!![day].bullets.value = addBullet(newBullet)
                 Log.i("DailyViewModel", "Successfully added bullet")

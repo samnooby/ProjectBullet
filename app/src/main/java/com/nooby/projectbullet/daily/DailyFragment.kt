@@ -21,7 +21,7 @@ import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.*
 
-class DailyFragment : Fragment(), BulletEditMenu.EditListener {
+class DailyFragment : Fragment(), BulletEditMenu.EditListener, BulletNoteEditMenu.EditNoteListener {
 
     private val mainData: MainData = MainData(title = "Daily Entries")
     private lateinit var binding: FragmentDailyBinding
@@ -45,94 +45,42 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener {
         val dailyViewModel =
             ViewModelProviders.of(this, viewModelFactory).get(DailyViewModel::class.java)
 
-        //Binds the data to the layout
+        //Binds viewmodel and data to the activity
         binding.myApp = mainData
         binding.dailyViewModel = dailyViewModel
         binding.lifecycleOwner = this
         setHasOptionsMenu(true)
 
-        //Create the adapter for the pageviewer and get it to constantly observe the dailyViewModelWeek
-        val viewPageAdapter = DailyPageAdapter(DailyPageListener({ bullet ->
-            setupEditPopup(bullet).show(parentFragmentManager, "Edit")
-        }, {
-            if (it.bulletType == BulletType.INCOMPLETETASK || it.bulletType == BulletType.EVENT) {
-                it.bulletType = BulletType.COMPLETETASK
-                binding.dailyViewModel?.changeBullet(it, binding.viewPager.currentItem)
-                val currentWeek = binding.dailyViewModel?.currentWeekNumber
-                if (currentWeek != null) {
-                    binding.dailyViewModel?.getWeek(numWeek = currentWeek)
-                }
-            }
-        }, { bullet, note ->
-            Log.i("DailyFragment", "Adding note $note")
-            bullet.bulletNotes = bullet.bulletNotes.plus(note)
-            binding.dailyViewModel?.changeBullet(bullet, binding.viewPager.currentItem)
-            val currentWeek = binding.dailyViewModel?.currentWeekNumber
-            if (currentWeek != null) {
-                binding.dailyViewModel?.getWeek(numWeek = currentWeek)
-            }
-        }))
-        dailyViewModel.currentWeek.observe(viewLifecycleOwner, Observer {
-            it.let {
-                Log.i("DailyFragment", "Updated viewpager week $it")
-//                for (day in it) {
-////                    Log.i("DailyFragment", "${day.name} Bullets ${day.bullets.value}")
-//                }
-                viewPageAdapter.days = it
-            }
-        })
-        //Sets the callback for the viewpager to allow it to be infinite scrolling
-        dailyPagerCallback = DailyPagerCallback {
-            binding.viewPager.post {
-                Log.i("DailyFragment", "Called page change function")
-                if (isStartUp) {
-                    Log.i("DailyFragment", "First time")
-                    isStartUp = false
-                    binding.viewPager.setCurrentItem(PAGE_LIMIT / 2, false)
-                } else {
-                    if (it == PAGE_LIMIT) {
-                        Log.i("DailyFragment", "Going back one week")
-                        dailyViewModel.getWeek(dailyViewModel.currentWeekNumber - 1)
-                    } else if (it == 1) {
-                        Log.i("DailyFragment", "Going forward one week")
-                        dailyViewModel.getWeek(dailyViewModel.currentWeekNumber + 1)
-                    }
-                    binding.viewPager.setCurrentItem(it, false)
-                }
-            }
-        }
-
+        //Sets up the ViewPager which shows the different days
+        val viewPageAdapter = setupDayPager(dailyViewModel)
         binding.viewPager.adapter = viewPageAdapter
-        Log.i("DailyFragment", "Got day ${Calendar.getInstance().get(Calendar.DAY_OF_WEEK)}")
         binding.viewPager.registerOnPageChangeCallback(dailyPagerCallback)
 
-        //creates a new bullet and resets the textboxes
-        fun addNewBullet() {
-            if (binding.txtAddBullet.text.isNotEmpty()) {
-                binding.dailyViewModel?.createBullet(
-                    binding.txtAddBullet.text.toString(),
-                    binding.viewPager.currentItem
-                )
-            }
-            binding.txtAddBullet.setText("")
-            binding.txtAddBullet.clearFocus()
-            val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(view?.windowToken, 0)
-        }
+        setupEventListeners(dailyViewModel)
 
-        //Set up event listeners
+        Log.i("DailyFragment", "DailyFragment created")
+
+        return binding.root
+    }
+
+    //setupEventListeners creates all clicklisteners on the fragment
+    private fun setupEventListeners(dailyViewModel: DailyViewModel) {
+        //Changing the bullet type
         binding.btnBulletType.setOnClickListener {
             setupTypePopup().showAsDropDown(binding.btnBulletType)
         }
+        //Adding Plus button
         binding.btnCreateBullet.setOnClickListener {
             addNewBullet()
         }
+        //Day navigation buttons
         binding.backDayBtn.setOnClickListener {
             binding.viewPager.setCurrentItem(binding.viewPager.currentItem - 1, true)
         }
         binding.forwardDayBtn.setOnClickListener {
             binding.viewPager.setCurrentItem(binding.viewPager.currentItem + 1, true)
         }
+        //Top of page date changing buttons
         binding.dailyHomeBtn.setOnClickListener {
             dailyViewModel.getWeek(newCurrentDay = LocalDate.now())
             binding.viewPager.setCurrentItem(
@@ -150,6 +98,7 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener {
             }
             datePicker.show(parentFragmentManager, "datePicker")
         }
+        //Key listener for enter key
         binding.txtAddBullet.setOnKeyListener { _, keyCode, event ->
             when {
                 ((keyCode == KeyEvent.KEYCODE_ENTER) && (event.action == KeyEvent.ACTION_DOWN)) -> {
@@ -159,15 +108,97 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener {
                 else -> false
             }
         }
-
-        Log.i("DailyFragment", "DailyFragment created")
-
-        return binding.root
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.i("DailyFragment", "DailyFragment destroyed")
+    //addNewBullet gets the viewmodel to create a new bullet and resets the page
+    private fun addNewBullet() {
+        if (binding.txtAddBullet.text.isNotEmpty()) {
+            binding.dailyViewModel?.createBullet(
+                binding.txtAddBullet.text.toString(),
+                binding.viewPager.currentItem
+            )
+        }
+        binding.txtAddBullet.setText("")
+        binding.txtAddBullet.clearFocus()
+        val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view?.windowToken, 0)
+    }
+
+    //setupDayPager creates the listeners and observers for the day viewpager
+    private fun setupDayPager(dailyViewModel: DailyViewModel): DailyPageAdapter {
+        //bulletClickListener controls what happens when a bullet is clicked
+        val bulletClickListener: (bullet: Bullet) -> Unit =
+            { setupEditPopup(it).show(parentFragmentManager, "Edit") }
+
+        //taskListener controls what happens when the task icon is clicked
+        val taskListener: (bullet: Bullet) -> Unit = {
+            if (it.bulletType == BulletType.INCOMPLETETASK || it.bulletType == BulletType.EVENT) {
+                it.bulletType = BulletType.COMPLETETASK
+                binding.dailyViewModel?.changeBullet(it, binding.viewPager.currentItem)
+                val currentWeek = binding.dailyViewModel?.currentWeekNumber
+                if (currentWeek != null) {
+                    binding.dailyViewModel?.getWeek(numWeek = currentWeek)
+                }
+            }
+        }
+
+        //noteListener listens for a new note and creates it
+        val noteListener: (bullet: Bullet, note: String) -> Unit = { bullet, note ->
+            Log.i("DailyFragment", "Adding note $note")
+            bullet.bulletNotes = bullet.bulletNotes.plus(note)
+            binding.dailyViewModel?.changeBullet(bullet, binding.viewPager.currentItem)
+            val currentWeek = binding.dailyViewModel?.currentWeekNumber
+            if (currentWeek != null) {
+                binding.dailyViewModel?.getWeek(numWeek = currentWeek)
+            }
+        }
+
+        //editNoteListener creates the edit note popup
+        val editNoteListener: (bullet: Bullet, notePosition: Int) -> Unit =
+            { bullet: Bullet, notePosition: Int ->
+                val editFragment =
+                    BulletNoteEditMenu(bullet, notePosition, bullet.bulletNotes[notePosition])
+                editFragment.setTargetFragment(this, 0)
+                editFragment.show(parentFragmentManager, "EditNote")
+            }
+
+        val viewPageAdapter =
+            DailyPageAdapter(
+                DailyPageListener(
+                    bulletClickListener,
+                    taskListener,
+                    noteListener,
+                    editNoteListener
+                )
+            )
+
+        //Constantly watches the current week and if it updates update the adapter
+        dailyViewModel.currentWeek.observe(viewLifecycleOwner, Observer {
+            it.let {
+                Log.i("DailyFragment", "Updated viewpager week $it")
+                viewPageAdapter.days = it
+            }
+        })
+
+        //Watches every page turn and when we reach the first or last page refresh and cycle
+        dailyPagerCallback = DailyPagerCallback {
+            binding.viewPager.post {
+                Log.i("DailyFragment", "Called page change function")
+                if (isStartUp) {
+                    isStartUp = false
+                    binding.viewPager.setCurrentItem(PAGE_LIMIT / 2, false)
+                } else {
+                    if (it == PAGE_LIMIT) {
+                        dailyViewModel.getWeek(dailyViewModel.currentWeekNumber - 1)
+                    } else if (it == 1) {
+                        dailyViewModel.getWeek(dailyViewModel.currentWeekNumber + 1)
+                    }
+                    binding.viewPager.setCurrentItem(it, false)
+                }
+            }
+        }
+
+        return viewPageAdapter
     }
 
     //setupPopup creates the popup that is showed when selecting a different bullet type
@@ -197,8 +228,9 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener {
         return editFragment
     }
 
-    //Updates the bullet when the popup is closed
+    //onDialogClose updates a bullet when its edit dialog is closed
     override fun onDialogClose(dialog: BulletEditMenu) {
+        //Checks what type of edit
         if (dialog.deleteBullet) {
             Log.i("DailyFragment", "Deleting bullet")
             binding.dailyViewModel?.deleteBullet(dialog.bullet, binding.viewPager.currentItem)
@@ -210,11 +242,25 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener {
             updateBullet.bulletDate = dialog.bulletDate
 
             binding.dailyViewModel?.changeBullet(updateBullet, binding.viewPager.currentItem)
-            val currentWeek = binding.dailyViewModel?.currentWeekNumber
-            if (currentWeek != null) {
-                binding.dailyViewModel?.getWeek(numWeek = currentWeek)
             }
+    }
+
+    override fun onDialogClose(dialog: BulletNoteEditMenu) {
+        val bullet = dialog.bullet
+        val tmpList = bullet.bulletNotes.toMutableList()
+        //If deleting the note remove it from the bullets notes
+        if (dialog.isDelete) {
+            Log.i("DailyFragment", "Deleting note")
+            tmpList.removeAt(dialog.notePosition)
+            bullet.bulletNotes = tmpList
+        } else {
+            //Change value of note
+            Log.i("DailyFragment", "changing new text ${dialog.editText} into ${dialog.notePosition} in $tmpList")
+            tmpList[dialog.notePosition] = dialog.editText
+            bullet.bulletNotes = tmpList
         }
 
+        //Updates the bullet in the database and refreshes the list
+        binding.dailyViewModel?.changeBullet(bullet, binding.viewPager.currentItem)
     }
 }
