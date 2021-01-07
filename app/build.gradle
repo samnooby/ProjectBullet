@@ -69,6 +69,9 @@ dependencies {
     //Extension and Coroutine support for room
     implementation "androidx.room:room-ktx:$version_room"
 
+    //JSON parsing library
+    implementation "com.beust:klaxon:$version_klaxon"
+
     //Testing
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

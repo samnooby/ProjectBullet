@@ -13,7 +13,8 @@ import com.nooby.projectbullet.database.Bullet
 import com.nooby.projectbullet.databinding.DailyPageBinding
 import com.nooby.projectbullet.generated.callback.OnClickListener
 
-class DailyPageAdapter(private val clickListener: DailyPageListener) : RecyclerView.Adapter<DailyPageAdapter.ViewHolder>() {
+class DailyPageAdapter(private val clickListener: DailyPageListener) :
+    RecyclerView.Adapter<DailyPageAdapter.ViewHolder>() {
 
     //The list of days displayed by the pageViewer
     var days = listOf<Day>()
@@ -23,7 +24,8 @@ class DailyPageAdapter(private val clickListener: DailyPageListener) : RecyclerV
             notifyDataSetChanged()
         }
 
-    class ViewHolder private constructor(private val binding: DailyPageBinding): RecyclerView.ViewHolder(binding.root) {
+    class ViewHolder private constructor(private val binding: DailyPageBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
         fun bind(
             day: Day,
@@ -31,9 +33,10 @@ class DailyPageAdapter(private val clickListener: DailyPageListener) : RecyclerV
         ) {
             //Bind the day to the layout and create the bindings
             binding.day = day
-            val bulletAdapter = BulletAdapter(BulletListener {
-                clickListener.onClick(it)
-            })
+            val bulletAdapter = BulletAdapter(
+                BulletListener({ clickListener.onClick(it) },
+                    { clickListener.onComplete(it) })
+            )
             //Adds an observer to the bullet adapter to update with livedata
             day.bullets.observe(itemView.context as LifecycleOwner, Observer {
                 it.let {
@@ -75,13 +78,17 @@ class DailyPagerCallback(private val listener: (Int) -> Unit) : ViewPager2.OnPag
     override fun onPageSelected(position: Int) {
         super.onPageSelected(position)
         Log.i("PageAdapter", "Checking page number got $position")
-        when(position) {
+        when (position) {
             0 -> listener.invoke(PAGE_LIMIT)
-            PAGE_LIMIT+1 -> listener.invoke(1)
+            PAGE_LIMIT + 1 -> listener.invoke(1)
         }
     }
 }
 
-class DailyPageListener(val clickListener: (bullet: Bullet) -> Unit) {
+class DailyPageListener(
+    val clickListener: (bullet: Bullet) -> Unit,
+    val taskListener: (bullet: Bullet) -> Unit
+) {
     fun onClick(bullet: Bullet) = clickListener(bullet)
+    fun onComplete(bullet: Bullet) = taskListener(bullet)
 }

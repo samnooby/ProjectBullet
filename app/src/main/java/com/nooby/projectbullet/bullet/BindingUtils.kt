@@ -3,6 +3,7 @@ package com.nooby.projectbullet.bullet
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.nooby.projectbullet.R
 import com.nooby.projectbullet.database.Bullet
 import com.nooby.projectbullet.database.BulletType
@@ -28,3 +29,4 @@ fun TextView.setMessageText(item: Bullet?) {
         text = item.message
     }
 }
+

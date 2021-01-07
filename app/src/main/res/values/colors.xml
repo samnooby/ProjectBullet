@@ -13,4 +13,5 @@
     <color name="background_primary">#f7faff</color>
     <color name="background_text">#ebeef2</color>
     <color name="background_bullets">#fffff5</color>
+    <color name="background_notes">#fafaf0</color>
 </resources>

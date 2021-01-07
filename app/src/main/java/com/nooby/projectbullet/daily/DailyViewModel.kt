@@ -129,7 +129,8 @@ class DailyViewModel(
                 val newBullet = Bullet(
                     message = message,
                     bulletDate = tmpDay.dayStart,
-                    bulletType = newBulletType
+                    bulletType = newBulletType,
+                    bulletNotes = listOf("This is a random note")
                 )
                 currentWeek.value!![day].bullets.value = addBullet(newBullet)
                 Log.i("DailyViewModel", "Successfully added bullet")

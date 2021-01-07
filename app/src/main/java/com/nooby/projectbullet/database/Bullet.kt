@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
+import com.beust.klaxon.Klaxon
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -28,7 +29,10 @@ data class Bullet(
         var message: String = "",
 
         @ColumnInfo(name = "bullet_icon")
-        var bulletType: BulletType = com.nooby.projectbullet.database.BulletType.NOTE
+        var bulletType: BulletType = com.nooby.projectbullet.database.BulletType.NOTE,
+
+        @ColumnInfo(name = "bullet_notes")
+        var bulletNotes: List<String> = listOf()
 )
 
 //Allows for storage of complex data types by converting them to primary types
@@ -49,10 +53,10 @@ class Converters {
         @TypeConverter
         fun typeToInt(bulletType: BulletType?): Int? {
                 return when(bulletType){
-                        BulletType.NOTE -> 0
+                        BulletType.EVENT -> 0
                         BulletType.INCOMPLETETASK -> 1
-                        BulletType.COMPLETETASK -> 2
-                        BulletType.EVENT -> 3
+                        BulletType.NOTE -> 2
+                        BulletType.COMPLETETASK -> 3
                         else -> null
                 }
         }
@@ -60,11 +64,23 @@ class Converters {
         @TypeConverter
         fun intToType(value: Int?): BulletType? {
                 return when(value){
-                        0 -> BulletType.NOTE
+                        0 -> BulletType.EVENT
                         1 -> BulletType.INCOMPLETETASK
-                        2 -> BulletType.COMPLETETASK
-                        3 -> BulletType.EVENT
+                        2 -> BulletType.NOTE
+                        3 -> BulletType.COMPLETETASK
                         else -> null
                 }
+        }
+
+        //Converts list of notes to string
+        @TypeConverter
+        fun listToString(value: List<String>): String {
+                return Klaxon().toJsonString(value)
+        }
+
+        //Converts string to list of notes
+        @TypeConverter
+        fun stringToList(value: String): List<String>? {
+                return Klaxon().parseArray(value)
         }
 }

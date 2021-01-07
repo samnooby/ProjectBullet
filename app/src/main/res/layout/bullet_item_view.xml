@@ -4,67 +4,116 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="bullet"
             type="com.nooby.projectbullet.database.Bullet" />
+
         <variable
             name="clickListener"
             type="com.nooby.projectbullet.bullet.BulletListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/background_bullets"
-    android:onClick="@{() -> clickListener.onClick(bullet)}"
-    >
+        android:id="@+id/bullet_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background_bullets"
+        android:onClick="@{() -> clickListener.onClick(bullet)}">
 
         <ImageButton
-        android:id="@+id/icon_bullet_type"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_standard"
-        android:layout_marginTop="@dimen/top_padding"
-        android:layout_marginEnd="@dimen/margin_standard"
-        android:background="@color/background_bullets"
-        android:paddingStart="@dimen/padding_large"
-        android:paddingTop="@dimen/padding_standard"
-        android:paddingEnd="@dimen/padding_large"
-        android:paddingBottom="@dimen/padding_standard"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/txt_view_bullet"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/bullet_icon_note"
-        app:bulletImage="@{bullet}"
-        />
+            android:id="@+id/icon_bullet_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_standard"
+            android:layout_marginTop="@dimen/top_padding"
+            android:layout_marginEnd="10dp"
+            android:background="@color/background_bullets"
+            android:paddingStart="@dimen/padding_large"
+            android:paddingTop="@dimen/padding_standard"
+            android:paddingEnd="@dimen/padding_large"
+            android:paddingBottom="@dimen/padding_standard"
+            app:bulletImage="@{bullet}"
+            app:layout_constraintEnd_toStartOf="@+id/txt_view_bullet"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/bullet_icon_note" />
 
         <TextView
-        android:id="@+id/txt_view_bullet"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_small"
-        android:layout_marginEnd="@dimen/margin_small"
-        android:background="@color/background_bullets"
-        android:fontFamily="@font/merriweather"
-        android:textColor="@color/text_color_primary"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/icon_bullet_type"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="This is a test bullet"
-        app:bulletText="@{bullet}"
-        />
+            android:id="@+id/txt_view_bullet"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="@dimen/margin_small"
+            android:background="@color/background_bullets"
+            android:fontFamily="@font/merriweather"
+            android:textColor="@color/text_color_primary"
+            app:bulletText="@{bullet}"
+            app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/icon_bullet_type"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="This is a test bullet" />
 
         <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/divider_width"
-        android:layout_marginTop="@dimen/top_padding"
-        android:background="@color/text_color_primary"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="parent"
-        />
+            android:id="@+id/view2"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/divider_width"
+            android:background="@color/text_color_primary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/bullet_note_list" />
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/bullet_note_list"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="75dp"
+            android:background="@color/background_bullets"
+            android:maxHeight="300dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="75dp"
+            android:background="@color/background_notes"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/icon_bullet_type">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="40dp"
+                android:background="@color/background_notes"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/add_icon" />
+
+            <EditText
+                android:id="@+id/new_note_txt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:background="@color/background_notes"
+                android:ems="10"
+                android:hint="Add new note"
+                android:inputType="textPersonName"
+                android:textColorHint="@color/text_hint_primary"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/imageView"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

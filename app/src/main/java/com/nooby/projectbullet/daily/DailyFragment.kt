@@ -15,6 +15,7 @@ import com.nooby.projectbullet.*
 import com.nooby.projectbullet.bullet.*
 import com.nooby.projectbullet.database.Bullet
 import com.nooby.projectbullet.database.BulletDatabase
+import com.nooby.projectbullet.database.BulletType
 import com.nooby.projectbullet.databinding.FragmentDailyBinding
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -44,6 +45,12 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener {
         val dailyViewModel =
             ViewModelProviders.of(this, viewModelFactory).get(DailyViewModel::class.java)
 
+        //Binds the data to the layout
+        binding.myApp = mainData
+        binding.dailyViewModel = dailyViewModel
+        binding.lifecycleOwner = this
+        setHasOptionsMenu(true)
+
 //        val adapter = BulletAdapter(BulletListener { bullet ->
 //            setupEditPopup(bullet).show(parentFragmentManager, "Edit")
 //        })
@@ -59,9 +66,19 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener {
 //        binding.bulletList.adapter = adapter
 
         //Create the adapter for the pageviewer and get it to constantly observe the dailyViewModelWeek
-        val viewPageAdapter = DailyPageAdapter(DailyPageListener { bullet ->
+        val viewPageAdapter = DailyPageAdapter(DailyPageListener({ bullet ->
             setupEditPopup(bullet).show(parentFragmentManager, "Edit")
-        })
+        }, {
+            val updatedBullet = it
+            if (updatedBullet.bulletType == BulletType.INCOMPLETETASK || updatedBullet.bulletType == BulletType.EVENT) {
+                updatedBullet.bulletType = BulletType.COMPLETETASK
+                binding.dailyViewModel?.changeBullet(it, binding.viewPager.currentItem)
+                val currentWeek = binding.dailyViewModel?.currentWeekNumber
+                if (currentWeek != null) {
+                    binding.dailyViewModel?.getWeek(numWeek = currentWeek)
+                }
+            }
+        }))
         dailyViewModel.currentWeek.observe(viewLifecycleOwner, Observer {
             it.let {
                 Log.i("DailyFragment", "Updated viewpager week $it")
@@ -95,11 +112,6 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener {
         binding.viewPager.adapter = viewPageAdapter
         Log.i("DailyFragment", "Got day ${Calendar.getInstance().get(Calendar.DAY_OF_WEEK)}")
         binding.viewPager.registerOnPageChangeCallback(dailyPagerCallback)
-        //Binds the data to the layout
-        binding.myApp = mainData
-        binding.dailyViewModel = dailyViewModel
-        binding.lifecycleOwner = this
-        setHasOptionsMenu(true)
 
         //creates a new bullet and resets the textboxes
         fun addNewBullet() {
@@ -131,7 +143,7 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener {
         binding.dailyHomeBtn.setOnClickListener {
             dailyViewModel.getWeek(newCurrentDay = LocalDate.now())
             binding.viewPager.setCurrentItem(
-                PAGE_LIMIT/2,
+                PAGE_LIMIT / 2,
                 true
             )
         }
@@ -139,7 +151,7 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener {
             val datePicker = DatePicker {
                 dailyViewModel.getWeek(newCurrentDay = it)
                 binding.viewPager.setCurrentItem(
-                    PAGE_LIMIT / 2 ,
+                    PAGE_LIMIT / 2,
                     true
                 )
             }
@@ -205,6 +217,10 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener {
             updateBullet.bulletDate = dialog.bulletDate
 
             binding.dailyViewModel?.changeBullet(updateBullet, binding.viewPager.currentItem)
+            val currentWeek = binding.dailyViewModel?.currentWeekNumber
+            if (currentWeek != null) {
+                binding.dailyViewModel?.getWeek(numWeek = currentWeek)
+            }
         }
 
     }

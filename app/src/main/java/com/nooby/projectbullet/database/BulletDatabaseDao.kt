@@ -17,8 +17,11 @@ interface BulletDatabaseDao {
     @Update
     fun update(bullet: Bullet)
 
-    @Query("SELECT * FROM bullet_table WHERE bullet_date BETWEEN :startDay AND :endDay")
+    @Query("SELECT * FROM bullet_table WHERE bullet_date BETWEEN :startDay AND :endDay ORDER BY bullet_icon ASC")
     fun get(startDay: LocalDateTime, endDay: LocalDateTime): List<Bullet>
+
+    @Query("SELECT * FROM bullet_table WHERE bullet_icon = :type AND bullet_date BETWEEN :startDay AND :endDay")
+    fun getByType(startDay: LocalDateTime, endDay: LocalDateTime, type: BulletType): List<Bullet>
 
     @Delete
     fun deleteBullet(bullet: Bullet)
