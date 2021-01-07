@@ -70,9 +70,11 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="75dp"
             android:background="@color/background_bullets"
-            android:maxHeight="300dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_max="400dp"
+            app:layout_constrainedHeight="true"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
@@ -88,7 +90,7 @@
             app:layout_constraintTop_toBottomOf="@+id/icon_bullet_type">
 
             <ImageView
-                android:id="@+id/imageView"
+                android:id="@+id/new_note_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="40dp"
@@ -110,8 +112,9 @@
                 android:textColorHint="@color/text_hint_primary"
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/imageView"
+                app:layout_constraintEnd_toStartOf="@+id/new_note_btn"
                 app:layout_constraintStart_toStartOf="parent"
+                android:textColor="@color/text_color_primary"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 

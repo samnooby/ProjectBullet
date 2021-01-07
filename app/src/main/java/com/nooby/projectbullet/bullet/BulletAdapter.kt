@@ -1,8 +1,11 @@
 package com.nooby.projectbullet.bullet
 
+import android.content.Context
 import android.opengl.Visibility
 import android.util.Log
 import android.view.*
+import android.view.inputmethod.InputMethod
+import android.view.inputmethod.InputMethodManager
 import androidx.recyclerview.widget.RecyclerView
 import com.nooby.projectbullet.database.Bullet
 import com.nooby.projectbullet.databinding.BulletItemViewBinding
@@ -43,12 +46,21 @@ class BulletAdapter(private val clickListener: BulletListener) :
         ) {
             binding.bullet = item
             val gestureDetector =
-                GestureDetector(itemView.context, GestureListener(item, clickListener) {
-                    if (binding.constraintLayout.visibility == View.VISIBLE) {
-                        binding.constraintLayout.visibility = View.GONE
-                    } else {
-                        if (it == 0) {
-                            binding.constraintLayout.visibility = View.VISIBLE
+                GestureDetector(itemView.context, GestureListener() {
+                    when (it) {
+                        0 -> {
+                            if (binding.constraintLayout.visibility == View.GONE) {
+                                binding.constraintLayout.visibility = View.VISIBLE
+                                binding.newNoteTxt.requestFocus()
+                            } else {
+                                Log.i("BulletAdapter", "Clicking listener")
+                                clickListener.onClick(item)
+                                binding.constraintLayout.visibility = View.GONE
+                            }
+                        }
+                        1 -> {
+                            clickListener.onClick(item)
+                            binding.constraintLayout.visibility = View.GONE
                         }
                     }
                 })
@@ -59,11 +71,25 @@ class BulletAdapter(private val clickListener: BulletListener) :
                 Log.i("BulletAdapter", "Testero")
                 clickListener.completeTask(item)
             }
+            binding.newNoteBtn.setOnClickListener {
+                Log.i("BulletAdapter", "New note button clicked")
+                binding.newNoteTxt.clearFocus()
+            }
             binding.executePendingBindings()
-            Log.i("BulletAdapter", "Got bullet $item")
-            val noteAdapter = BulletNoteAdapter(item.bulletNotes)
+            Log.i("BulletAdapter", "Got bullet ${item.bulletNotes.size}")
+            val noteAdapter = BulletNoteAdapter()
+            noteAdapter.notes = item.bulletNotes
             binding.bulletNoteList.adapter = noteAdapter
-            binding.constraintLayout.visibility = View.GONE
+            binding.newNoteTxt.setOnFocusChangeListener { v, hasFocus ->
+                if (!hasFocus) {
+                    binding.constraintLayout.visibility = View.GONE
+                    if (binding.newNoteTxt.text.isNotEmpty()) {
+                        clickListener.addNote(item, binding.newNoteTxt.text.toString())
+                        binding.newNoteTxt.setText("")
+                    }
+                }
+            }
+
         }
 
         companion object {
@@ -76,8 +102,6 @@ class BulletAdapter(private val clickListener: BulletListener) :
         }
 
         private class GestureListener(
-            val item: Bullet,
-            val listener: BulletListener,
             val visibilityListener: (Int) -> (Unit)
         ) : GestureDetector.SimpleOnGestureListener() {
             override fun onSingleTapUp(e: MotionEvent?): Boolean {
@@ -87,7 +111,6 @@ class BulletAdapter(private val clickListener: BulletListener) :
 
             override fun onDoubleTap(e: MotionEvent?): Boolean {
                 visibilityListener(1)
-                listener.onClick(item)
                 return true
             }
         }
@@ -97,8 +120,10 @@ class BulletAdapter(private val clickListener: BulletListener) :
 
 class BulletListener(
     val clickListener: (bullet: Bullet) -> Unit,
-    val taskListener: (bullet: Bullet) -> Unit
+    val taskListener: (bullet: Bullet) -> Unit,
+    val noteListener: (bullet: Bullet, note: String) -> Unit
 ) {
     fun onClick(bullet: Bullet) = clickListener(bullet)
     fun completeTask(bullet: Bullet) = taskListener(bullet)
+    fun addNote(bullet: Bullet, note: String) = noteListener(bullet, note)
 }

@@ -6,9 +6,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.nooby.projectbullet.databinding.BulletNoteViewBinding
 
-class BulletNoteAdapter(private val bulletNotes: List<String>) : RecyclerView.Adapter<BulletNoteAdapter.ViewHolder>() {
+class BulletNoteAdapter() : RecyclerView.Adapter<BulletNoteAdapter.ViewHolder>() {
 
-    var notes = bulletNotes
+    var notes = listOf<String>()
         set(value) {
             field = value
             notifyDataSetChanged()

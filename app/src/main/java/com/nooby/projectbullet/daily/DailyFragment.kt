@@ -51,32 +51,25 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener {
         binding.lifecycleOwner = this
         setHasOptionsMenu(true)
 
-//        val adapter = BulletAdapter(BulletListener { bullet ->
-//            setupEditPopup(bullet).show(parentFragmentManager, "Edit")
-//        })
-//        //Tells the adapter to observe the data in view model
-//        dailyViewModel.bullets.observe(viewLifecycleOwner, Observer {
-//            it.let {
-//                Log.i("DailyViewModel", "Changed bullets list")
-//                adapter.bullets = it
-//            }
-//        })
-
-        //Binds the data to the application
-//        binding.bulletList.adapter = adapter
-
         //Create the adapter for the pageviewer and get it to constantly observe the dailyViewModelWeek
         val viewPageAdapter = DailyPageAdapter(DailyPageListener({ bullet ->
             setupEditPopup(bullet).show(parentFragmentManager, "Edit")
         }, {
-            val updatedBullet = it
-            if (updatedBullet.bulletType == BulletType.INCOMPLETETASK || updatedBullet.bulletType == BulletType.EVENT) {
-                updatedBullet.bulletType = BulletType.COMPLETETASK
+            if (it.bulletType == BulletType.INCOMPLETETASK || it.bulletType == BulletType.EVENT) {
+                it.bulletType = BulletType.COMPLETETASK
                 binding.dailyViewModel?.changeBullet(it, binding.viewPager.currentItem)
                 val currentWeek = binding.dailyViewModel?.currentWeekNumber
                 if (currentWeek != null) {
                     binding.dailyViewModel?.getWeek(numWeek = currentWeek)
                 }
+            }
+        }, { bullet, note ->
+            Log.i("DailyFragment", "Adding note $note")
+            bullet.bulletNotes = bullet.bulletNotes.plus(note)
+            binding.dailyViewModel?.changeBullet(bullet, binding.viewPager.currentItem)
+            val currentWeek = binding.dailyViewModel?.currentWeekNumber
+            if (currentWeek != null) {
+                binding.dailyViewModel?.getWeek(numWeek = currentWeek)
             }
         }))
         dailyViewModel.currentWeek.observe(viewLifecycleOwner, Observer {
