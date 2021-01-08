@@ -123,10 +123,12 @@
                     android:inputType="textMultiLine|textCapSentences"
                     android:paddingTop="@dimen/text_padding"
                     android:maxLines="3"
-                    android:maxLength="90"
+                    android:maxLength="105"
                     android:paddingBottom="@dimen/text_padding"
                     android:textColor="@color/text_color_primary"
-                    android:textColorHint="@color/text_hint_primary" />
+                    android:textColorHint="@color/text_hint_primary"
+                    android:textSize="14sp"
+                    />
 
                 <ImageButton
                     android:id="@+id/btn_create_bullet"

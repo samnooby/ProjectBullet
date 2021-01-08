@@ -17,6 +17,8 @@ import com.nooby.projectbullet.database.Bullet
 import com.nooby.projectbullet.database.BulletDatabase
 import com.nooby.projectbullet.database.BulletType
 import com.nooby.projectbullet.databinding.FragmentDailyBinding
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -135,10 +137,6 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener, BulletNoteEditMen
             if (it.bulletType == BulletType.INCOMPLETETASK || it.bulletType == BulletType.EVENT) {
                 it.bulletType = BulletType.COMPLETETASK
                 binding.dailyViewModel?.changeBullet(it, binding.viewPager.currentItem)
-                val currentWeek = binding.dailyViewModel?.currentWeekNumber
-                if (currentWeek != null) {
-                    binding.dailyViewModel?.getWeek(numWeek = currentWeek)
-                }
             }
         }
 
@@ -147,10 +145,6 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener, BulletNoteEditMen
             Log.i("DailyFragment", "Adding note $note")
             bullet.bulletNotes = bullet.bulletNotes.plus(note)
             binding.dailyViewModel?.changeBullet(bullet, binding.viewPager.currentItem)
-            val currentWeek = binding.dailyViewModel?.currentWeekNumber
-            if (currentWeek != null) {
-                binding.dailyViewModel?.getWeek(numWeek = currentWeek)
-            }
         }
 
         //editNoteListener creates the edit note popup
@@ -239,9 +233,18 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener, BulletNoteEditMen
             val updateBullet = dialog.bullet
             updateBullet.message = dialog.bulletText
             updateBullet.bulletType = dialog.bulletType
+            val isDateChange = updateBullet.bulletDate != dialog.bulletDate
+
             updateBullet.bulletDate = dialog.bulletDate
 
             binding.dailyViewModel?.changeBullet(updateBullet, binding.viewPager.currentItem)
+            if (isDateChange) {
+                binding.dailyViewModel?.getWeek(newCurrentDayNumber = binding.viewPager.currentItem)
+                binding.viewPager.setCurrentItem(
+                    PAGE_LIMIT / 2,
+                    false
+                )
+            }
             }
     }
 
@@ -262,5 +265,6 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener, BulletNoteEditMen
 
         //Updates the bullet in the database and refreshes the list
         binding.dailyViewModel?.changeBullet(bullet, binding.viewPager.currentItem)
+
     }
 }

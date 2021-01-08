@@ -30,16 +30,18 @@
         android:background="@color/background_text"
         android:fontFamily="@font/merriweather"
         android:inputType="textMultiLine|textCapSentences"
+        android:maxLength="105"
         android:maxLines="3"
         android:paddingLeft="2dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:maxLength="105"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:textColor="@color/text_color_primary"
-        app:layout_constraintBottom_toBottomOf="@+id/edit_bullet_type"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/edit_bullet_type"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:textSize="14sp"
+        tools:text="This is a test bullet"
+        />
 
     <ImageButton
         android:id="@+id/edit_bullet_day"
@@ -79,7 +81,7 @@
         app:backgroundTint="@color/background_primary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_bullet_type" />
+        app:layout_constraintTop_toBottomOf="@+id/edit_txt_bullet" />
 
     <View
         android:id="@+id/view"
@@ -87,7 +89,6 @@
         android:layout_height="@dimen/divider_width"
         android:layout_marginStart="@dimen/margin_small"
         android:background="@color/text_color_primary"
-        app:layout_constraintBottom_toBottomOf="@+id/edit_bullet_type"
         app:layout_constraintEnd_toEndOf="@+id/edit_txt_bullet"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edit_txt_bullet" />

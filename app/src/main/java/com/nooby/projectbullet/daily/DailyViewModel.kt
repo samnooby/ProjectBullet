@@ -49,29 +49,40 @@ class DailyViewModel(
     }
 
     //GetWeek updates the list of current days to the new week
-    fun getWeek(numWeek: Int = currentWeekNumber, newCurrentDay: LocalDate? = null) {
+    fun getWeek(
+        numWeek: Int = currentWeekNumber,
+        newCurrentDay: LocalDate? = null,
+        newCurrentDayNumber: Int = 0
+    ) {
         uiScope.launch {
             Log.i("DailyViewModel", "Changing week to $numWeek")
             if (newCurrentDay != null) {
                 currentDay = newCurrentDay
+            } else if (newCurrentDayNumber != 0) {
+                val day = currentWeek.value?.get(newCurrentDayNumber)
+                if (day != null) {
+                    currentDay = day.dayStart.toLocalDate()
+                }
             }
             //Gets the time for the start and end of first page
             var dayStart = currentDay.atStartOfDay()
-            dayStart = dayStart.plusDays((numWeek* PAGE_LIMIT - PAGE_LIMIT/2).toLong())
+            dayStart = dayStart.plusDays((numWeek * PAGE_LIMIT - PAGE_LIMIT / 2).toLong())
             currentWeekNumber = numWeek
-            var dayEnd = dayStart.plusMinutes((11*60) + 59)
+            var dayEnd = dayStart.plusMinutes((11 * 60) + 59)
             Log.i("DailyViewModel", "Start is $dayStart, end is $dayEnd")
 
             //Adds all the days in the page list and get their bullets from the database
             var daysList = mutableListOf<Day>()
 
-            for (day in 1..(PAGE_LIMIT+2)) {
-                daysList.add(Day(
-                    dayStart.format(bulletFormatter),
-                    MutableLiveData(getBullets(dayStart, dayEnd)),
-                    dayStart,
-                    dayEnd
-                ))
+            for (day in 1..(PAGE_LIMIT + 2)) {
+                daysList.add(
+                    Day(
+                        dayStart.format(bulletFormatter),
+                        MutableLiveData(getBullets(dayStart, dayEnd)),
+                        dayStart,
+                        dayEnd
+                    )
+                )
                 dayStart = dayStart.plusDays(1)
                 dayEnd = dayEnd.plusDays(1)
             }
@@ -80,6 +91,7 @@ class DailyViewModel(
             currentWeek.value = daysList
         }
     }
+
     //getBullets gets all the bullets between the start and end of the current day
     private suspend fun getBullets(dayStart: LocalDateTime, dayEnd: LocalDateTime): List<Bullet> {
         return withContext(Dispatchers.IO) {
@@ -88,8 +100,8 @@ class DailyViewModel(
     }
 
     private fun getBulletDay(bullet: Bullet): Pair<LocalDateTime, LocalDateTime> {
-        val newDate = bullet.bulletDate.plusMinutes((11*60) + 59)
-        Log.i("DailyViewModel","Got bullet day ${bullet.bulletDate}, $newDate")
+        val newDate = bullet.bulletDate.plusMinutes((11 * 60) + 59)
+        Log.i("DailyViewModel", "Got bullet day ${bullet.bulletDate}, $newDate")
         return Pair(bullet.bulletDate, newDate)
     }
 

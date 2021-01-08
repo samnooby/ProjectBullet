@@ -91,16 +91,25 @@ class BulletAdapter(private val clickListener: BulletListener) :
                 }
             }
 
-            //Sets up padding for the text boxes
-            val textLayoutParams = binding.txtViewBullet.layoutParams as ViewGroup.MarginLayoutParams
-            val iconLayoutParams = binding.iconBulletType.layoutParams as ViewGroup.MarginLayoutParams
-            if (item.message.length > 90) {
-                textLayoutParams.topMargin = 4
-                iconLayoutParams.topMargin = 8
-            } else if (item.message.length > 45) {
-                textLayoutParams.topMargin = 15
+            binding.newNoteTxt.setOnKeyListener { _, keyCode, event ->
+                when {
+                    ((keyCode == KeyEvent.KEYCODE_ENTER) && (event.action == KeyEvent.ACTION_DOWN)) -> {
+                        val imm = binding.newNoteTxt.context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        imm.hideSoftInputFromWindow(binding.newNoteTxt?.windowToken, 0)
+                        return@setOnKeyListener true
+                    }
+                    else -> false
+                }
             }
-            binding.txtViewBullet.layoutParams = textLayoutParams
+
+            //Sets up padding for the text boxes
+            val iconLayoutParams = binding.iconBulletType.layoutParams as ViewGroup.MarginLayoutParams
+            if (item.message.length > 85) {
+                iconLayoutParams.topMargin = 45
+            } else if (item.message.length > 43) {
+                iconLayoutParams.topMargin = 22
+            }
+            binding.iconBulletType.layoutParams = iconLayoutParams
 
             binding.executePendingBindings()
             Log.i("BulletAdapter", "Got bullet ${item.bulletNotes.size}")
