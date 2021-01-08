@@ -6,7 +6,9 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/background_notes">
+        android:background="@color/background_notes"
+        android:layout_marginVertical="2dp"
+        >
 
         <ImageView
             android:id="@+id/note_img"
@@ -29,6 +31,7 @@
             android:textColor="@color/text_color_primary"
             app:layout_constraintBottom_toBottomOf="@+id/note_img"
             app:layout_constraintEnd_toEndOf="parent"
+            android:maxLines="3"
             app:layout_constraintStart_toEndOf="@+id/note_img"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="This is a random note" />

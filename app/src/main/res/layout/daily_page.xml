@@ -22,6 +22,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text ="Wednesday"
             app:dayText="@{day}"
+            android:paddingVertical="2dp"
             android:fontFamily="@font/merriweather_bold"
             android:textAlignment="center"
             android:textSize="20sp"

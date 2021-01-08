@@ -20,13 +20,15 @@
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:background="@color/background_text"
+        android:maxLength="90"
         android:fontFamily="@font/merriweather"
-        android:inputType="textCapSentences"
+        android:inputType="textMultiLine|textCapSentences"
         android:paddingVertical="5dp"
         android:textColor="@color/text_color_primary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/delete_note_btn"
         app:layout_constraintStart_toStartOf="parent"
+        android:maxLines="3"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView

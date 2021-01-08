@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.fragment.app.DialogFragment
@@ -36,6 +37,8 @@ class BulletNoteEditMenu(val bullet: Bullet, val notePosition: Int, val note: St
             newNoteText.setOnKeyListener { v, keyCode, event ->
                 when {
                     ((keyCode == KeyEvent.KEYCODE_ENTER) && (event.action == KeyEvent.ACTION_DOWN)) -> {
+                        val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        imm.hideSoftInputFromWindow(view?.windowToken, 0)
                         dismiss()
                         return@setOnKeyListener true
                     }

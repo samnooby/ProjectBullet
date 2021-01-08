@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethod
 import android.view.inputmethod.InputMethodManager
+import androidx.core.view.marginTop
 import androidx.recyclerview.widget.RecyclerView
 import com.nooby.projectbullet.database.Bullet
 import com.nooby.projectbullet.databinding.BulletItemViewBinding
@@ -89,6 +90,17 @@ class BulletAdapter(private val clickListener: BulletListener) :
                     }
                 }
             }
+
+            //Sets up padding for the text boxes
+            val textLayoutParams = binding.txtViewBullet.layoutParams as ViewGroup.MarginLayoutParams
+            val iconLayoutParams = binding.iconBulletType.layoutParams as ViewGroup.MarginLayoutParams
+            if (item.message.length > 90) {
+                textLayoutParams.topMargin = 4
+                iconLayoutParams.topMargin = 8
+            } else if (item.message.length > 45) {
+                textLayoutParams.topMargin = 15
+            }
+            binding.txtViewBullet.layoutParams = textLayoutParams
 
             binding.executePendingBindings()
             Log.i("BulletAdapter", "Got bullet ${item.bulletNotes.size}")
