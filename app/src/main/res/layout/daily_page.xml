@@ -6,7 +6,7 @@
     <data>
         <variable
             name="day"
-            type="com.nooby.projectbullet.daily.Day" />
+            type="com.nooby.projectbullet.database.Day" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

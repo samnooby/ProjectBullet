@@ -44,14 +44,13 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="2dp"
             android:layout_marginTop="7dp"
-            android:layout_marginEnd="@dimen/margin_small"
             android:layout_marginBottom="12dp"
             android:background="@color/background_bullets"
             android:fontFamily="@font/merriweather"
             android:textColor="@color/text_color_primary"
             app:bulletText="@{bullet}"
             app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/bullet_drag_icon"
             app:layout_constraintStart_toEndOf="@+id/icon_bullet_type"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="This is a test bullet " />
@@ -120,6 +119,16 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <ImageView
+            android:id="@+id/bullet_drag_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/txt_view_bullet"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/txt_view_bullet"
+            app:srcCompat="@drawable/drag_icon" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

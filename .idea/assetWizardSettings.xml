@@ -23,7 +23,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="file:$USER_HOME$/Android/Sdk/icons/material/materialiconsround/delete/round_delete_24.xml" />
+                                      <entry key="url" value="jar:file:/home/sam/android-studio/plugins/android/lib/android.jar!/images/material/icons/materialiconstwotone/drag_indicator/twotone_drag_indicator_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -33,9 +33,9 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="b21b1d" />
+                            <entry key="color" value="423824" />
                             <entry key="opacityPercent" value="87" />
-                            <entry key="outputName" value="delete_icon" />
+                            <entry key="outputName" value="ic_twotone_drag_indicator_24" />
                           </map>
                         </option>
                       </PersistentState>

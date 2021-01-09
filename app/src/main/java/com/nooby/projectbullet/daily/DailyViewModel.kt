@@ -7,18 +7,11 @@ import androidx.lifecycle.MutableLiveData
 import com.nooby.projectbullet.database.Bullet
 import com.nooby.projectbullet.database.BulletDatabaseDao
 import com.nooby.projectbullet.database.BulletType
+import com.nooby.projectbullet.database.Day
 import kotlinx.coroutines.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
-
-data class Day(
-    val name: String,
-    var bullets: MutableLiveData<List<Bullet>>,
-    val dayStart: LocalDateTime,
-    val dayEnd: LocalDateTime
-)
 
 const val PAGE_LIMIT = 101
 
@@ -75,14 +68,26 @@ class DailyViewModel(
             var daysList = mutableListOf<Day>()
 
             for (day in 1..(PAGE_LIMIT + 2)) {
-                daysList.add(
-                    Day(
-                        dayStart.format(bulletFormatter),
-                        MutableLiveData(getBullets(dayStart, dayEnd)),
-                        dayStart,
-                        dayEnd
+                var currentDay = getDay(dayStart)
+                if (currentDay == null) {
+                    currentDay = Day(
+                        name = dayStart.format(bulletFormatter),
+                        dayStart = dayStart,
+                        dayEnd = dayEnd,
+                        bulletOrder = emptyList()
                     )
-                )
+                } else {
+                    Log.i("DailyViewModel", "Got day $currentDay")
+                    val unorderedBullets = getBullets(dayStart, dayEnd)
+                    val orderedBullets = mutableListOf<Bullet>()
+                    currentDay.bulletOrder.forEach { l ->
+                        orderedBullets.add(unorderedBullets.find { it.bulletId == l }!!)
+                        return@forEach
+                    }
+
+                    currentDay.bullets.value = orderedBullets.toList()
+                }
+                daysList.add(currentDay)
                 dayStart = dayStart.plusDays(1)
                 dayEnd = dayEnd.plusDays(1)
             }
@@ -95,9 +100,23 @@ class DailyViewModel(
     //getBullets gets all the bullets between the start and end of the current day
     private suspend fun getBullets(dayStart: LocalDateTime, dayEnd: LocalDateTime): List<Bullet> {
         return withContext(Dispatchers.IO) {
-            database.get(dayStart, dayEnd)
+            database.getBullets(dayStart, dayEnd)
         }
     }
+
+    //getDay gets the day with the given start time from the database
+    private suspend fun getDay(dayStart: LocalDateTime): com.nooby.projectbullet.database.Day {
+        return withContext(Dispatchers.IO) {
+            database.getDay(dayStart)
+        }
+    }
+
+    private suspend fun updateDayValue(day: Day) {
+        return withContext(Dispatchers.IO) {
+            database.updateDay(day)
+        }
+    }
+
 
     private fun getBulletDay(bullet: Bullet): Pair<LocalDateTime, LocalDateTime> {
         val newDate = bullet.bulletDate.plusMinutes((11 * 60) + 59)
@@ -106,29 +125,58 @@ class DailyViewModel(
     }
 
     //Adds the bullet to the database and resets the current bullets
-    private suspend fun addBullet(bullet: Bullet): List<Bullet> {
+    private suspend fun addBullet(bullet: Bullet, day: Day): List<Bullet> {
         return withContext(Dispatchers.IO) {
-            database.insert(bullet)
-            val (dayStart, dayEnd) = getBulletDay(bullet)
-            database.get(dayStart, dayEnd)
+            Log.i("DailyViewModel", "Adding to list ${day.bulletOrder}")
+            day.bulletOrder = day.bulletOrder.plus(database.insert(bullet))
+            Log.i("DailyViewModel", "Added new id to list got ${day.bulletOrder}")
+            database.updateDay(day)
+            database.getBullets(day.dayStart, day.dayEnd)
         }
     }
 
     //updateBullet updates the bullet in the database
-    private suspend fun updateBullet(bullet: Bullet): List<Bullet> {
+    private suspend fun updateBullet(bullet: Bullet, day: Day): List<Bullet> {
         return withContext(Dispatchers.IO) {
             database.update(bullet)
-            val (dayStart, dayEnd) = getBulletDay(bullet)
-            database.get(dayStart, dayEnd)
+            val days = database.getBullets(day.dayStart, day.dayEnd)
+            //Deletes the day to save space if it has no bullets
+            if (days.isEmpty()) {
+                database.deleteDay(day)
+            }
+            //Adds a day if there is no day in the day transfering to
+            val (start, end) = getBulletDay(bullet)
+            if (start != day.dayStart && end != day.dayEnd) {
+                val toDays = database.getDay(start)
+                Log.i("DailyViewModel", "got day $toDays")
+                if (toDays == null) {
+                    database.updateDay(
+                        Day(
+                            name = start.format(bulletFormatter),
+                            dayStart = start,
+                            dayEnd = end,
+                            bulletOrder = listOf(bullet.bulletId)
+                        )
+                    )
+                }
+            }
+            days
         }
     }
 
     //removeBullet deletes the given bullet from the database using its id
-    private suspend fun removeBullet(bullet: Bullet): List<Bullet> {
+    private suspend fun removeBullet(bullet: Bullet, day: Day): List<Bullet> {
         return withContext(Dispatchers.IO) {
+            //Deletes the bullet and refreshes the bullets from the database
             database.deleteBullet(bullet)
             val (dayStart, dayEnd) = getBulletDay(bullet)
-            database.get(dayStart, dayEnd)
+            val bullet = database.getBullets(dayStart, dayEnd)
+            //Deletes the day to save space if it has no bullets
+            if (bullet.isEmpty()) {
+                Log.i("DailyViewModel", "Deleting day")
+                database.deleteDay(day)
+            }
+            bullet
         }
     }
 
@@ -143,7 +191,7 @@ class DailyViewModel(
                     bulletDate = tmpDay.dayStart,
                     bulletType = newBulletType
                 )
-                currentWeek.value!![day].bullets.value = addBullet(newBullet)
+                currentWeek.value!![day].bullets.value = addBullet(newBullet, tmpDay)
                 Log.i("DailyViewModel", "Successfully added bullet")
             }
         }
@@ -152,7 +200,10 @@ class DailyViewModel(
     //changeBullet updates the bullet and refreshes the list
     fun changeBullet(bullet: Bullet, day: Int) {
         uiScope.launch {
-            currentWeek.value?.get(day)?.bullets?.value = updateBullet(bullet)
+            val bulletDay = currentWeek.value?.get(day)
+            if (bulletDay != null) {
+                bulletDay.bullets?.value = updateBullet(bullet, bulletDay)
+            }
             Log.i("DailyViewModel", "Successfully updated bullet")
         }
     }
@@ -160,8 +211,18 @@ class DailyViewModel(
     //DeleteBullet removes the bullet from the database and refreshes the list
     fun deleteBullet(bullet: Bullet, day: Int) {
         uiScope.launch {
-            currentWeek.value?.get(day)?.bullets?.value = removeBullet(bullet)
+            val bulletDay = currentWeek.value?.get(day)
+            if (bulletDay != null) {
+                bulletDay.bullets?.value = removeBullet(bullet, bulletDay)
+            }
             Log.i("DailyViewModel", "Successfully deleted bullet")
+        }
+    }
+
+    fun addBulletOrder(order: List<Long>, day: Day) {
+        uiScope.launch {
+            day.bulletOrder = order
+            updateDayValue(day)
         }
     }
 }

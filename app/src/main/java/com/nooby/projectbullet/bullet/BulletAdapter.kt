@@ -8,6 +8,7 @@ import android.view.*
 import android.view.inputmethod.InputMethod
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.marginTop
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.nooby.projectbullet.database.Bullet
 import com.nooby.projectbullet.databinding.BulletItemViewBinding
@@ -15,15 +16,22 @@ import java.util.*
 import kotlin.concurrent.schedule
 
 
-class BulletAdapter(private val clickListener: BulletListener) :
+class BulletAdapter(private val clickListener: BulletListener, private val dragHelper: ItemTouchHelper) :
     RecyclerView.Adapter<BulletAdapter.ViewHolder>() {
+
+    //Whether or not to notify the adapter when the data set changes(Used for dragging)
+    var doesNotify = true
 
     //The list of items that is displayed by the recyclerview
     var bullets = listOf<Bullet>()
         set(value) {
             field = value
-            notifyDataSetChanged()
+            if (doesNotify) {
+                Log.i("BulletAdapter","Notifying of update")
+                notifyDataSetChanged()
+            }
         }
+
 
     override fun getItemCount() = bullets.size
 
@@ -36,17 +44,24 @@ class BulletAdapter(private val clickListener: BulletListener) :
         //Tells recycle view how to set the element at each position
         val item = bullets[position]
         holder.bind(item, clickListener)
+        holder.dragImage.setOnTouchListener{ view: View, motionEvent: MotionEvent ->
+            if (motionEvent.actionMasked == MotionEvent.ACTION_DOWN) {
+                dragHelper.startDrag(holder)
+            }
+            false
+        }
     }
 
     class ViewHolder private constructor(private val binding: BulletItemViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
+        val dragImage = binding.bulletDragIcon
+
         //bind prepares the view that is used
         @SuppressLint("ClickableViewAccessibility")
         fun bind(
             item: Bullet,
-            clickListener: BulletListener
-        ) {
+            clickListener: BulletListener) {
             binding.bullet = item
             //Creates the gesture detector to lookout control note text box
             val gestureDetector =
@@ -119,7 +134,6 @@ class BulletAdapter(private val clickListener: BulletListener) :
             })
             noteAdapter.notes = item.bulletNotes
             binding.bulletNoteList.adapter = noteAdapter
-
 
         }
 

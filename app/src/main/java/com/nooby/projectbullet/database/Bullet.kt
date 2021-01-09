@@ -30,7 +30,7 @@ data class Bullet(
         var message: String = "",
 
         @ColumnInfo(name = "bullet_icon")
-        var bulletType: BulletType = com.nooby.projectbullet.database.BulletType.NOTE,
+        var bulletType: BulletType = BulletType.NOTE,
 
         @ColumnInfo(name = "bullet_notes")
         var bulletNotes: List<String> = listOf()
@@ -39,12 +39,12 @@ data class Bullet(
 //Allows for storage of complex data types by converting them to primary types
 class Converters {
         private val formatter = DateTimeFormatter.ofPattern("EEEE LLLL dd, yyyy HH:mm:ss")
-        //Converts a long to a date
+        //Converts a long to a datetime
         @TypeConverter
         fun fromTimeStamp(value: String?): LocalDateTime? {
                 return value?.let { LocalDateTime.parse(value, formatter) }
         }
-        //Converts day to long
+        //Converts daytime to long
         @TypeConverter
         fun toTimeStamp(date: LocalDateTime?): String? {
                 return date?.format(formatter)
@@ -82,6 +82,18 @@ class Converters {
         //Converts string to list of notes
         @TypeConverter
         fun stringToList(value: String): List<String>? {
+                return Klaxon().parseArray(value)
+        }
+
+        //Converts a list of long to string
+        @TypeConverter
+        fun idListToString(value: List<Long>): String {
+                return Klaxon().toJsonString(value)
+        }
+
+        //Converts string to list of notes
+        @TypeConverter
+        fun stringToIdList(value: String): List<Long>? {
                 return Klaxon().parseArray(value)
         }
 }

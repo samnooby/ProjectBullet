@@ -16,6 +16,7 @@ import com.nooby.projectbullet.bullet.*
 import com.nooby.projectbullet.database.Bullet
 import com.nooby.projectbullet.database.BulletDatabase
 import com.nooby.projectbullet.database.BulletType
+import com.nooby.projectbullet.database.Day
 import com.nooby.projectbullet.databinding.FragmentDailyBinding
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -156,13 +157,22 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener, BulletNoteEditMen
                 editFragment.show(parentFragmentManager, "EditNote")
             }
 
+        //dragListener edits the list when a bullet is dragged
+        val dragListener: (bulletOrder: List<Long>, day: Day) -> Unit = { list: List<Long>, day: Day ->
+            Log.i("DailyFragment", "Got changes $list for day $day")
+            if (list.isNotEmpty()) {
+                dailyViewModel.addBulletOrder(list, day)
+            }
+        }
+
         val viewPageAdapter =
             DailyPageAdapter(
                 DailyPageListener(
                     bulletClickListener,
                     taskListener,
                     noteListener,
-                    editNoteListener
+                    editNoteListener,
+                    dragListener
                 )
             )
 
