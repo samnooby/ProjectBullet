@@ -18,18 +18,16 @@ import com.nooby.projectbullet.database.BulletDatabase
 import com.nooby.projectbullet.database.BulletType
 import com.nooby.projectbullet.database.Day
 import com.nooby.projectbullet.databinding.FragmentDailyBinding
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
-import java.util.*
 
 class DailyFragment : Fragment(), BulletEditMenu.EditListener, BulletNoteEditMenu.EditNoteListener {
 
     private val mainData: MainData = MainData(title = "Daily Entries")
     private lateinit var binding: FragmentDailyBinding
     private lateinit var dailyPagerCallback: DailyPagerCallback
+    private lateinit var dailyPageAdapter: DailyPageAdapter
     private var isStartUp = true
+
 
 
     override fun onCreateView(
@@ -55,8 +53,8 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener, BulletNoteEditMen
         setHasOptionsMenu(true)
 
         //Sets up the ViewPager which shows the different days
-        val viewPageAdapter = setupDayPager(dailyViewModel)
-        binding.viewPager.adapter = viewPageAdapter
+        dailyPageAdapter = setupDayPager(dailyViewModel)
+        binding.viewPager.adapter = dailyPageAdapter
         binding.viewPager.registerOnPageChangeCallback(dailyPagerCallback)
 
         setupEventListeners(dailyViewModel)
@@ -237,6 +235,7 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener, BulletNoteEditMen
         //Checks what type of edit
         if (dialog.deleteBullet) {
             Log.i("DailyFragment", "Deleting bullet")
+            dailyPageAdapter.close()
             binding.dailyViewModel?.deleteBullet(dialog.bullet, binding.viewPager.currentItem)
         } else {
             Log.i("DailyFragment", "Updating bullet")
@@ -247,6 +246,7 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener, BulletNoteEditMen
 
             updateBullet.bulletDate = dialog.bulletDate
 
+            dailyPageAdapter.close()
             binding.dailyViewModel?.changeBullet(updateBullet, binding.viewPager.currentItem)
             if (isDateChange) {
                 binding.dailyViewModel?.getWeek(newCurrentDayNumber = binding.viewPager.currentItem)
@@ -276,5 +276,11 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener, BulletNoteEditMen
         //Updates the bullet in the database and refreshes the list
         binding.dailyViewModel?.changeBullet(bullet, binding.viewPager.currentItem)
 
+    }
+
+    override fun onPause() {
+        super.onPause()
+        dailyPageAdapter.close()
+        Log.i("DailyFragment", "Paused")
     }
 }

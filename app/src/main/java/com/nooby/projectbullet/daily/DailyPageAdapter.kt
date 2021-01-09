@@ -132,15 +132,26 @@ class DailyPageAdapter(private val clickListener: DailyPageListener) :
         holder.bind(item, clickListener)
     }
 
+    private lateinit var currentHolder: ViewHolder
+
     override fun onViewDetachedFromWindow(holder: ViewHolder) {
         super.onViewDetachedFromWindow(holder)
 //        holder.removeTouchHelper()
         clickListener.onDrag(holder.listOrder, holder.day)
     }
 
+    override fun onViewAttachedToWindow(holder: ViewHolder) {
+        super.onViewAttachedToWindow(holder)
+        currentHolder = holder
+    }
+
     override fun onViewRecycled(holder: ViewHolder) {
         super.onViewRecycled(holder)
         Log.i("DailyPageAdapter", "Recycling page ${holder.day}")
+    }
+
+    fun close() {
+        clickListener.onDrag(currentHolder.listOrder, currentHolder.day)
     }
 }
 

@@ -5,6 +5,7 @@ import android.content.Context
 import android.opengl.Visibility
 import android.util.Log
 import android.view.*
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethod
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.marginTop
@@ -94,6 +95,10 @@ class BulletAdapter(private val clickListener: BulletListener, private val dragH
             }
             binding.newNoteBtn.setOnClickListener {
                 Log.i("BulletAdapter", "New note button clicked")
+                if (binding.newNoteTxt.text.isNotEmpty()) {
+                    clickListener.addNote(item, binding.newNoteTxt.text.toString())
+                    binding.newNoteTxt.setText("")
+                }
                 binding.newNoteTxt.clearFocus()
             }
             binding.newNoteTxt.setOnFocusChangeListener { v, hasFocus ->
@@ -103,14 +108,21 @@ class BulletAdapter(private val clickListener: BulletListener, private val dragH
                         clickListener.addNote(item, binding.newNoteTxt.text.toString())
                         binding.newNoteTxt.setText("")
                     }
+                    binding.constraintLayout.visibility = View.GONE
                 }
             }
 
             binding.newNoteTxt.setOnKeyListener { _, keyCode, event ->
                 when {
                     ((keyCode == KeyEvent.KEYCODE_ENTER) && (event.action == KeyEvent.ACTION_DOWN)) -> {
+                        Log.i("BulletAdapter", "Enter key pressed")
                         val imm = binding.newNoteTxt.context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                         imm.hideSoftInputFromWindow(binding.newNoteTxt?.windowToken, 0)
+                        if (binding.newNoteTxt.text.isNotEmpty()) {
+                            clickListener.addNote(item, binding.newNoteTxt.text.toString())
+                            binding.newNoteTxt.setText("")
+                        }
+                        binding.newNoteTxt.clearFocus()
                         return@setOnKeyListener true
                     }
                     else -> false
@@ -134,7 +146,7 @@ class BulletAdapter(private val clickListener: BulletListener, private val dragH
             })
             noteAdapter.notes = item.bulletNotes
             binding.bulletNoteList.adapter = noteAdapter
-            binding.newNoteTxt.imeOptions = EditorInfo.IME_ACTION_DONE
+            binding.newNoteTxt.imeOptions = EditorInfo.IME_ACTION_NONE
 
         }
 
