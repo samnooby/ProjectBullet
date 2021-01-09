@@ -78,14 +78,7 @@ class DailyViewModel(
                     )
                 } else {
                     Log.i("DailyViewModel", "Got day $currentDay")
-                    val unorderedBullets = getBullets(dayStart, dayEnd)
-                    val orderedBullets = mutableListOf<Bullet>()
-                    currentDay.bulletOrder.forEach { l ->
-                        orderedBullets.add(unorderedBullets.find { it.bulletId == l }!!)
-                        return@forEach
-                    }
-
-                    currentDay.bullets.value = orderedBullets.toList()
+                    currentDay.bullets.value = getBullets(currentDay)
                 }
                 daysList.add(currentDay)
                 dayStart = dayStart.plusDays(1)
@@ -98,9 +91,13 @@ class DailyViewModel(
     }
 
     //getBullets gets all the bullets between the start and end of the current day
-    private suspend fun getBullets(dayStart: LocalDateTime, dayEnd: LocalDateTime): List<Bullet> {
+    private suspend fun getBullets(day: Day): List<Bullet> {
         return withContext(Dispatchers.IO) {
-            database.getBullets(dayStart, dayEnd)
+            var bullets = database.getBullets(day.dayStart, day.dayEnd)
+            bullets = bullets.sortedBy { bullet ->
+                day.bulletOrder.indexOfFirst { bullet.bulletId == it }
+            }
+            bullets
         }
     }
 
@@ -131,7 +128,7 @@ class DailyViewModel(
             day.bulletOrder = day.bulletOrder.plus(database.insert(bullet))
             Log.i("DailyViewModel", "Added new id to list got ${day.bulletOrder}")
             database.updateDay(day)
-            database.getBullets(day.dayStart, day.dayEnd)
+            getBullets(day)
         }
     }
 
@@ -139,7 +136,7 @@ class DailyViewModel(
     private suspend fun updateBullet(bullet: Bullet, day: Day): List<Bullet> {
         return withContext(Dispatchers.IO) {
             database.update(bullet)
-            val days = database.getBullets(day.dayStart, day.dayEnd)
+            val days = getBullets(day)
             //Deletes the day to save space if it has no bullets
             if (days.isEmpty()) {
                 database.deleteDay(day)
@@ -169,8 +166,7 @@ class DailyViewModel(
         return withContext(Dispatchers.IO) {
             //Deletes the bullet and refreshes the bullets from the database
             database.deleteBullet(bullet)
-            val (dayStart, dayEnd) = getBulletDay(bullet)
-            val bullet = database.getBullets(dayStart, dayEnd)
+            val bullet = getBullets(day)
             //Deletes the day to save space if it has no bullets
             if (bullet.isEmpty()) {
                 Log.i("DailyViewModel", "Deleting day")
