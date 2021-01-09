@@ -134,6 +134,7 @@ class BulletAdapter(private val clickListener: BulletListener, private val dragH
             })
             noteAdapter.notes = item.bulletNotes
             binding.bulletNoteList.adapter = noteAdapter
+            binding.newNoteTxt.imeOptions = EditorInfo.IME_ACTION_DONE
 
         }
 
