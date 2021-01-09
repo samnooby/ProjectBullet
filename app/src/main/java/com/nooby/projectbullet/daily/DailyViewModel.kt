@@ -95,7 +95,9 @@ class DailyViewModel(
         return withContext(Dispatchers.IO) {
             var bullets = database.getBullets(day.dayStart, day.dayEnd)
             bullets = bullets.sortedBy { bullet ->
-                day.bulletOrder.indexOfFirst { bullet.bulletId == it }
+                day.bulletOrder.indexOfFirst {
+                    bullet.bulletId == it
+                }
             }
             bullets
         }
@@ -122,10 +124,12 @@ class DailyViewModel(
     }
 
     //Adds the bullet to the database and resets the current bullets
-    private suspend fun addBullet(bullet: Bullet, day: Day): List<Bullet> {
+    private suspend fun addBullet(bullet: Bullet, day: Day, insertPosition: Int): List<Bullet> {
         return withContext(Dispatchers.IO) {
-            Log.i("DailyViewModel", "Adding to list ${day.bulletOrder}")
-            day.bulletOrder = day.bulletOrder.plus(database.insert(bullet))
+            Log.i("DailyViewModel", "Adding to list ${day.bulletOrder} into postition $insertPosition")
+            val newBulletOrder = day.bulletOrder as MutableList<Long>
+            newBulletOrder.add(insertPosition, database.insert(bullet))
+            day.bulletOrder = newBulletOrder
             Log.i("DailyViewModel", "Added new id to list got ${day.bulletOrder}")
             database.updateDay(day)
             getBullets(day)
@@ -177,7 +181,7 @@ class DailyViewModel(
     }
 
     //Creates a new bullet with the given message,date and type
-    fun createBullet(message: String, day: Int) {
+    fun createBullet(message: String, day: Int, insertPosition: Int) {
         uiScope.launch {
             val tmpDay = currentWeek.value?.get(day)
             Log.i("DailyViewModel", "Creating bullet for day $tmpDay")
@@ -187,7 +191,7 @@ class DailyViewModel(
                     bulletDate = tmpDay.dayStart,
                     bulletType = newBulletType
                 )
-                currentWeek.value!![day].bullets.value = addBullet(newBullet, tmpDay)
+                currentWeek.value!![day].bullets.value = addBullet(newBullet, tmpDay, insertPosition)
                 Log.i("DailyViewModel", "Successfully added bullet")
             }
         }

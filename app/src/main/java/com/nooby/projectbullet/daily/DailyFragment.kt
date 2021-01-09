@@ -114,9 +114,11 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener, BulletNoteEditMen
     //addNewBullet gets the viewmodel to create a new bullet and resets the page
     private fun addNewBullet() {
         if (binding.txtAddBullet.text.isNotEmpty()) {
+            val currentPosition = dailyPageAdapter.getCurrentInsertItem()
             binding.dailyViewModel?.createBullet(
                 binding.txtAddBullet.text.toString(),
-                binding.viewPager.currentItem
+                binding.viewPager.currentItem,
+                currentPosition
             )
         }
         binding.txtAddBullet.setText("")
@@ -274,6 +276,7 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener, BulletNoteEditMen
         }
 
         //Updates the bullet in the database and refreshes the list
+        dailyPageAdapter.close()
         binding.dailyViewModel?.changeBullet(bullet, binding.viewPager.currentItem)
 
     }

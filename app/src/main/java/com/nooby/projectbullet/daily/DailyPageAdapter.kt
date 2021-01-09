@@ -13,7 +13,6 @@ import com.nooby.projectbullet.bullet.BulletListener
 import com.nooby.projectbullet.database.Bullet
 import com.nooby.projectbullet.database.Day
 import com.nooby.projectbullet.databinding.DailyPageBinding
-import com.nooby.projectbullet.generated.callback.OnClickListener
 import java.util.*
 
 class DailyPageAdapter(private val clickListener: DailyPageListener) :
@@ -40,7 +39,7 @@ class DailyPageAdapter(private val clickListener: DailyPageListener) :
                 return binding.day!!
             }
         private lateinit var originalOrder: List<Long>
-        private lateinit var bulletAdapter: BulletAdapter
+        lateinit var bulletAdapter: BulletAdapter
         private lateinit var touchHelper: ItemTouchHelper
 
         fun bind(
@@ -152,6 +151,10 @@ class DailyPageAdapter(private val clickListener: DailyPageListener) :
 
     fun close() {
         clickListener.onDrag(currentHolder.listOrder, currentHolder.day)
+    }
+
+    fun getCurrentInsertItem(): Int {
+        return currentHolder.bulletAdapter.getCurrentInsertItem()
     }
 }
 

@@ -31,11 +31,12 @@
             android:paddingStart="@dimen/padding_large"
             android:paddingTop="4dp"
             android:paddingEnd="@dimen/padding_large"
-            android:paddingBottom="@dimen/padding_standard"
+            android:paddingBottom="4dp"
             app:bulletImage="@{bullet}"
+            app:layout_constraintBottom_toBottomOf="@+id/txt_view_bullet"
             app:layout_constraintEnd_toStartOf="@+id/txt_view_bullet"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/txt_view_bullet"
             app:srcCompat="@drawable/bullet_icon_note" />
 
         <TextView
@@ -114,6 +115,7 @@
                 android:textColor="@color/text_color_primary"
                 android:textColorHint="@color/text_hint_primary"
                 android:visibility="visible"
+                android:maxLength="87"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/new_note_btn"
                 app:layout_constraintStart_toStartOf="parent"
