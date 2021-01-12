@@ -26,6 +26,6 @@ data class Day(
     var bulletOrder: List<Long>
 ) {
     @Ignore
-    var bullets: MutableLiveData<List<Bullet>> = MutableLiveData()
+    var bullets: MutableLiveData<List<BulletWithTag>> = MutableLiveData()
 }
 

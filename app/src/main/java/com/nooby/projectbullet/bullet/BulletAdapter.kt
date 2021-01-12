@@ -12,6 +12,7 @@ import androidx.core.view.marginTop
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.nooby.projectbullet.database.Bullet
+import com.nooby.projectbullet.database.BulletWithTag
 import com.nooby.projectbullet.databinding.BulletItemViewBinding
 import java.text.FieldPosition
 import java.util.*
@@ -25,7 +26,7 @@ class BulletAdapter(private val clickListener: BulletListener, private val dragH
     var doesNotify = true
     var movingUp = false
     //The list of items that is displayed by the recyclerview
-    var bullets = listOf<Bullet>()
+    var bullets = listOf<BulletWithTag>()
         set(value) {
             field = value
             if (doesNotify) {
@@ -34,6 +35,7 @@ class BulletAdapter(private val clickListener: BulletListener, private val dragH
             }
         }
 
+    //used to determine the position of newly added bullets
     private var lastInsert: Int = 0
 
     override fun getItemCount() = bullets.size
@@ -43,10 +45,12 @@ class BulletAdapter(private val clickListener: BulletListener, private val dragH
         return ViewHolder.from(parent)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         //Tells recycle view how to set the element at each position
         val item = bullets[position]
-        holder.bind(item, clickListener, position)
+        holder.bind(item, clickListener)
+        //Sets up the drag icon
         holder.dragImage.setOnTouchListener{ view: View, motionEvent: MotionEvent ->
             if (motionEvent.actionMasked == MotionEvent.ACTION_DOWN) {
                 dragHelper.startDrag(holder)
@@ -59,17 +63,32 @@ class BulletAdapter(private val clickListener: BulletListener, private val dragH
         RecyclerView.ViewHolder(binding.root) {
 
         val dragImage = binding.bulletDragIcon
-        var bulletPosition = 0
 
         //bind prepares the view that is used
         @SuppressLint("ClickableViewAccessibility")
         fun bind(
-            item: Bullet,
-            clickListener: BulletListener,
-            pos: Int
+            item: BulletWithTag,
+            clickListener: BulletListener
             ) {
-            bulletPosition = pos
-            binding.bullet = item
+            binding.bullet = item.bullet
+            setupEventHandlers(clickListener, item.bullet)
+
+            binding.executePendingBindings()
+            Log.i("BulletAdapter", "Got bullet ${item.bullet.bulletNotes.size}")
+            //The adapter for the list of notes on the page
+            val noteAdapter = BulletNoteAdapter(NoteListener {
+                clickListener.editNote(item.bullet, it)
+            })
+            noteAdapter.notes = item.bullet.bulletNotes
+            binding.bulletNoteList.adapter = noteAdapter
+            binding.newNoteTxt.imeOptions = EditorInfo.IME_ACTION_NONE
+
+        }
+
+        private fun setupEventHandlers(
+            clickListener: BulletListener,
+            item: Bullet
+        ) {
             //Creates the gesture detector to lookout control note text box
             val gestureDetector =
                 GestureDetector(itemView.context, GestureListener() {
@@ -91,14 +110,17 @@ class BulletAdapter(private val clickListener: BulletListener, private val dragH
                         }
                     }
                 })
-            //Sets up the touch and event listeners on the page
+            //Sets up root touch listener
             binding.root.setOnTouchListener { _, event ->
                 gestureDetector.onTouchEvent(event)
             }
+            //Completes the bullet if it is a task or event
             binding.iconBulletType.setOnClickListener {
                 Log.i("BulletAdapter", "Testero")
                 clickListener.completeTask(item)
             }
+
+            //Adds a new note if there is text in the new note textbox
             binding.newNoteBtn.setOnClickListener {
                 Log.i("BulletAdapter", "New note button clicked")
                 if (binding.newNoteTxt.text.isNotEmpty()) {
@@ -117,12 +139,14 @@ class BulletAdapter(private val clickListener: BulletListener, private val dragH
                 }
             }
 
+            //Enterkey adds a new note if the text box is not empty
             binding.newNoteTxt.setOnKeyListener { _, keyCode, event ->
                 Log.i("BulletAdapter", "Pressed")
                 when {
                     ((keyCode == KeyEvent.KEYCODE_ENTER) && (event.action == KeyEvent.ACTION_DOWN)) -> {
                         Log.i("BulletAdapter", "Enter key pressed")
-                        val imm = binding.newNoteTxt.context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        val imm =
+                            binding.newNoteTxt.context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                         imm.hideSoftInputFromWindow(binding.newNoteTxt?.windowToken, 0)
                         if (binding.newNoteTxt.text.isNotEmpty()) {
                             clickListener.addNote(item, binding.newNoteTxt.text.toString())
@@ -134,17 +158,6 @@ class BulletAdapter(private val clickListener: BulletListener, private val dragH
                     else -> false
                 }
             }
-
-            binding.executePendingBindings()
-            Log.i("BulletAdapter", "Got bullet ${item.bulletNotes.size}")
-            //The adapter for the list of notes on the page
-            val noteAdapter = BulletNoteAdapter(NoteListener {
-                clickListener.editNote(item, it)
-            })
-            noteAdapter.notes = item.bulletNotes
-            binding.bulletNoteList.adapter = noteAdapter
-            binding.newNoteTxt.imeOptions = EditorInfo.IME_ACTION_NONE
-
         }
 
         companion object {
@@ -176,8 +189,8 @@ class BulletAdapter(private val clickListener: BulletListener, private val dragH
 
     override fun onViewAttachedToWindow(holder: ViewHolder) {
         super.onViewAttachedToWindow(holder)
-        movingUp = holder.bulletPosition <= lastInsert
-        lastInsert = holder.bulletPosition
+        movingUp = holder.adapterPosition <= lastInsert
+        lastInsert = holder.adapterPosition
         Log.i("BulletAdapter", "Last insert changed to $lastInsert")
     }
 

@@ -29,11 +29,14 @@ class DailyPageAdapter(private val clickListener: DailyPageListener) :
     class ViewHolder private constructor(private val binding: DailyPageBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
+        //listOrder is empty if no bullets have been moved, but if bullets have been moved it
+        //holds the order of the bullets
         val listOrder: List<Long>
             get() {
-                val newOrder = binding.day?.bullets?.value?.map { it.bulletId } ?: listOf()
+                val newOrder = binding.day?.bullets?.value?.map { it.bullet.bulletId } ?: listOf()
                 return if (newOrder == originalOrder) listOf() else newOrder
             }
+
         val day: Day
             get() {
                 return binding.day!!
@@ -47,8 +50,9 @@ class DailyPageAdapter(private val clickListener: DailyPageListener) :
             clickListener: DailyPageListener
         ) {
             Log.i("DailyPageAdapter", "Binding page for day $day")
-            //Bind the day to the layout and create the bindings
+            //Binds the day to the fragment
             binding.day = day
+            //Sets up the touch handlers for the adapter and creates the adapter with the listeners
             setupTouchHelper()
             bulletAdapter = BulletAdapter(
                 BulletListener({ clickListener.onClick(it) },
@@ -64,7 +68,7 @@ class DailyPageAdapter(private val clickListener: DailyPageListener) :
                     bulletAdapter.bullets = it
                 }
             })
-            originalOrder = day.bullets.value?.map { it.bulletId } ?: listOf()
+            originalOrder = day.bullets.value?.map { it.bullet.bulletId } ?: listOf()
             //Sets up the drag controls
             binding.bulletList.adapter = bulletAdapter
             binding.executePendingBindings()
@@ -78,6 +82,7 @@ class DailyPageAdapter(private val clickListener: DailyPageListener) :
             }
         }
 
+        //setupTouchHelper sets up the drag and drop for the items in the recyclerview
         private fun setupTouchHelper() {
             touchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
                 ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
@@ -92,13 +97,14 @@ class DailyPageAdapter(private val clickListener: DailyPageListener) :
                     original: RecyclerView.ViewHolder,
                     target: RecyclerView.ViewHolder
                 ): Boolean {
-                    //If a task is dragged update the position
+                    //Gets the positions from the view holders
                     val sourcePosition = original.adapterPosition
                     val targetPosition = target.adapterPosition
                     if (sourcePosition == targetPosition) {
                         return false
                     }
                     Log.i("DailyPageAdapter", "Moving page to $sourcePosition from $targetPosition")
+                    //Swaps the bullets and notifies the adapter that there has been a change
                     val tmpBullets = day.bullets.value?.toMutableList()
                     Collections.swap(tmpBullets, sourcePosition, targetPosition)
                     bulletAdapter.doesNotify = false
@@ -136,6 +142,7 @@ class DailyPageAdapter(private val clickListener: DailyPageListener) :
     override fun onViewDetachedFromWindow(holder: ViewHolder) {
         super.onViewDetachedFromWindow(holder)
 //        holder.removeTouchHelper()
+        //Updates the list in the backend when the view is detached
         clickListener.onDrag(holder.listOrder, holder.day)
     }
 
@@ -163,6 +170,7 @@ class DailyPagerCallback(private val listener: (Int) -> Unit) : ViewPager2.OnPag
     override fun onPageSelected(position: Int) {
         super.onPageSelected(position)
         Log.i("PageAdapter", "Checking page number got $position")
+        //Allows for the viewpager to have infinite scolling
         when (position) {
             0 -> listener.invoke(PAGE_LIMIT)
             PAGE_LIMIT + 1 -> listener.invoke(1)

@@ -1,9 +1,6 @@
 package com.nooby.projectbullet.database
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.TypeConverter
+import androidx.room.*
 import com.beust.klaxon.Klaxon
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -34,6 +31,22 @@ data class Bullet(
 
         @ColumnInfo(name = "bullet_notes")
         var bulletNotes: List<String> = listOf()
+)
+
+@Entity(primaryKeys = ["tagId", "bulletId"])
+data class BulletTagCrossRef(
+        val tagId: Long,
+        val bulletId: Long
+)
+
+data class BulletWithTag(
+        @Embedded val bullet: Bullet,
+        @Relation(
+                parentColumn = "bulletId",
+                entityColumn = "tagId",
+                associateBy = Junction(BulletTagCrossRef::class)
+        )
+        val tags: List<Tag>
 )
 
 //Allows for storage of complex data types by converting them to primary types

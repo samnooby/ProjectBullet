@@ -22,7 +22,6 @@ import java.time.LocalDate
 
 class DailyFragment : Fragment(), BulletEditMenu.EditListener, BulletNoteEditMenu.EditNoteListener {
 
-    private val mainData: MainData = MainData(title = "Daily Entries")
     private lateinit var binding: FragmentDailyBinding
     private lateinit var dailyPagerCallback: DailyPagerCallback
     private lateinit var dailyPageAdapter: DailyPageAdapter
@@ -46,8 +45,6 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener, BulletNoteEditMen
         val dailyViewModel =
             ViewModelProviders.of(this, viewModelFactory).get(DailyViewModel::class.java)
 
-        //Binds viewmodel and data to the activity
-        binding.myApp = mainData
         binding.dailyViewModel = dailyViewModel
         binding.lifecycleOwner = this
         setHasOptionsMenu(true)
@@ -57,6 +54,7 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener, BulletNoteEditMen
         binding.viewPager.adapter = dailyPageAdapter
         binding.viewPager.registerOnPageChangeCallback(dailyPagerCallback)
 
+        //Sets up click and keyboard listeners
         setupEventListeners(dailyViewModel)
 
         Log.i("DailyFragment", "DailyFragment created")
@@ -81,25 +79,8 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener, BulletNoteEditMen
         binding.forwardDayBtn.setOnClickListener {
             binding.viewPager.setCurrentItem(binding.viewPager.currentItem + 1, true)
         }
-        //Top of page date changing buttons
-        binding.dailyHomeBtn.setOnClickListener {
-            dailyViewModel.getWeek(newCurrentDay = LocalDate.now())
-            binding.viewPager.setCurrentItem(
-                PAGE_LIMIT / 2,
-                true
-            )
-        }
-        binding.dailyDateBtn.setOnClickListener {
-            val datePicker = DatePicker {
-                dailyViewModel.getWeek(newCurrentDay = it)
-                binding.viewPager.setCurrentItem(
-                    PAGE_LIMIT / 2,
-                    true
-                )
-            }
-            datePicker.show(parentFragmentManager, "datePicker")
-        }
-        //Key listener for enter key
+
+        //Key listener for enter key when entering a new bullet
         binding.txtAddBullet.setOnKeyListener { _, keyCode, event ->
             when {
                 ((keyCode == KeyEvent.KEYCODE_ENTER) && (event.action == KeyEvent.ACTION_DOWN)) -> {
@@ -108,6 +89,29 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener, BulletNoteEditMen
                 }
                 else -> false
             }
+        }
+
+        //Top of page home button
+        binding.dailyHomeBtn.setOnClickListener {
+            dailyPageAdapter.close()
+            dailyViewModel.getDays(newCurrentDay = LocalDate.now())
+            binding.viewPager.setCurrentItem(
+                PAGE_LIMIT / 2,
+                true
+            )
+        }
+
+        //Top of page date select button
+        binding.dailyDateBtn.setOnClickListener {
+            dailyPageAdapter.close()
+            val datePicker = DatePicker {
+                dailyViewModel.getDays(newCurrentDay = it)
+                binding.viewPager.setCurrentItem(
+                    PAGE_LIMIT / 2,
+                    true
+                )
+            }
+            datePicker.show(parentFragmentManager, "datePicker")
         }
     }
 
@@ -177,7 +181,7 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener, BulletNoteEditMen
             )
 
         //Constantly watches the current week and if it updates update the adapter
-        dailyViewModel.currentWeek.observe(viewLifecycleOwner, Observer {
+        dailyViewModel.currentDays.observe(viewLifecycleOwner, Observer {
             it.let {
                 Log.i("DailyFragment", "Updated viewpager week $it")
                 viewPageAdapter.days = it
@@ -193,9 +197,9 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener, BulletNoteEditMen
                     binding.viewPager.setCurrentItem(PAGE_LIMIT / 2, false)
                 } else {
                     if (it == PAGE_LIMIT) {
-                        dailyViewModel.getWeek(dailyViewModel.currentWeekNumber - 1)
+                        dailyViewModel.getDays(dailyViewModel.currentPageNumber - 1)
                     } else if (it == 1) {
-                        dailyViewModel.getWeek(dailyViewModel.currentWeekNumber + 1)
+                        dailyViewModel.getDays(dailyViewModel.currentPageNumber + 1)
                     }
                     binding.viewPager.setCurrentItem(it, false)
                 }
@@ -251,7 +255,7 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener, BulletNoteEditMen
             dailyPageAdapter.close()
             binding.dailyViewModel?.changeBullet(updateBullet, binding.viewPager.currentItem)
             if (isDateChange) {
-                binding.dailyViewModel?.getWeek(newCurrentDayNumber = binding.viewPager.currentItem)
+                binding.dailyViewModel?.getDays(newCurrentDayNumber = binding.viewPager.currentItem)
                 binding.viewPager.setCurrentItem(
                     PAGE_LIMIT / 2,
                     false

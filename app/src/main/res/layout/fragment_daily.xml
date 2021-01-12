@@ -4,11 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
-        <variable
-            name="MyApp"
-            type="com.nooby.projectbullet.MainData" />
-
         <variable
             name="DailyViewModel"
             type="com.nooby.projectbullet.daily.DailyViewModel" />
@@ -24,17 +19,30 @@
             android:id="@+id/daily_home_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="@dimen/padding_standard"
+            android:padding="@dimen/icon_btn_padding"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/home_icon" />
+            app:srcCompat="@drawable/home_icon"
+            android:contentDescription="@string/btn_home"
+            />
+
+        <ImageView
+            android:id="@+id/daily_filter_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/icon_btn_padding"
+            app:layout_constraintBottom_toBottomOf="@+id/daily_home_btn"
+            app:layout_constraintStart_toEndOf="@+id/daily_home_btn"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/filter_icon"
+            android:contentDescription="@string/btn_sort" />
 
         <TextView
             android:id="@+id/txt_daily_title"
             style="@style/title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@={MyApp.title}"
+            android:text="@string/daily_title"
             app:layout_constraintEnd_toStartOf="@+id/daily_date_btn"
             app:layout_constraintStart_toEndOf="@+id/daily_home_btn"
             app:layout_constraintTop_toTopOf="parent"
@@ -44,7 +52,7 @@
             android:id="@+id/daily_date_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="9dp"
+            android:padding="@dimen/icon_btn_padding"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/date_icon" />
@@ -53,12 +61,13 @@
             android:id="@+id/viewPager"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginVertical="@dimen/viewpager_vertical"
             app:layout_constraintBottom_toTopOf="@+id/day_buttons"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txt_daily_title" />
+            app:layout_constraintTop_toBottomOf="@+id/txt_daily_title" >
+
+        </androidx.viewpager2.widget.ViewPager2>
 
         <!--        <TextView-->
         <!--            android:id="@+id/txt_date"-->
@@ -108,7 +117,8 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@color/background_primary"
-                    app:srcCompat="@drawable/bullet_icon_note" />
+                    app:srcCompat="@drawable/bullet_icon_note"
+                    android:contentDescription="@string/btn_bullet_type" />
 
                 <EditText
                     android:id="@+id/txt_add_bullet"
@@ -121,13 +131,12 @@
                     android:fontFamily="@font/merriweather"
                     android:hint="@string/hint_new_bullet"
                     android:inputType="textMultiLine|textCapSentences"
-                    android:paddingTop="@dimen/text_padding"
                     android:maxLines="3"
                     android:maxLength="105"
-                    android:paddingBottom="@dimen/text_padding"
                     android:textColor="@color/text_color_primary"
                     android:textColorHint="@color/text_hint_primary"
                     android:textSize="14sp"
+                    android:paddingVertical="@dimen/txt_newbullet_vertical"
                     />
 
                 <ImageButton
@@ -136,7 +145,8 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@color/background_primary"
-                    app:srcCompat="@drawable/add_icon" />
+                    app:srcCompat="@drawable/add_icon"
+                    android:contentDescription="@string/btn_create_bullet" />
 
             </LinearLayout>
 
@@ -152,7 +162,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@color/background_primary"
-                    android:contentDescription="@string/go_back_a_day"
+                    android:contentDescription="@string/btn_day_back"
                     app:srcCompat="@drawable/back_icon" />
 
                 <ImageButton
@@ -161,7 +171,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@color/background_primary"
-                    android:contentDescription="@string/go_back_a_day"
+                    android:contentDescription="@string/btn_day_forward"
                     app:srcCompat="@drawable/next_icon" />
             </LinearLayout>
         </LinearLayout>

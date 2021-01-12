@@ -18,8 +18,9 @@ interface BulletDatabaseDao {
     @Update
     fun update(bullet: Bullet)
 
+    @Transaction
     @Query("SELECT * FROM bullet_table WHERE bullet_date BETWEEN :startDay AND :endDay ORDER BY bullet_icon ASC")
-    fun getBullets(startDay: LocalDateTime, endDay: LocalDateTime): List<Bullet>
+    fun getBullets(startDay: LocalDateTime, endDay: LocalDateTime): List<BulletWithTag>
 
     @Query("SELECT * FROM bullet_table WHERE bullet_icon = :type AND bullet_date BETWEEN :startDay AND :endDay")
     fun getByType(startDay: LocalDateTime, endDay: LocalDateTime, type: BulletType): List<Bullet>
@@ -41,4 +42,10 @@ interface BulletDatabaseDao {
 
     @Delete
     fun deleteDay(day: Day)
+
+    @Query("SELECT * FROM tag_table")
+    fun getAllTags(): List<Tag>
+
+    @Insert()
+    fun createTag(tag: Tag)
 }

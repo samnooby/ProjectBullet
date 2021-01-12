@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
 //The class for the database containing the bullets
-@Database(entities = [Bullet::class, Day::class], version = 6, exportSchema = false)
+@Database(entities = [Bullet::class, Day::class, Tag::class, BulletTagCrossRef::class], version = 7, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class BulletDatabase : RoomDatabase() {
 

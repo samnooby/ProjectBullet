@@ -5,6 +5,8 @@ import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.LifecycleOwner
@@ -18,7 +20,8 @@ import java.lang.IllegalStateException
 import java.time.LocalDateTime
 import java.util.*
 
-class BulletEditMenu(val bullet: Bullet, private val lifecycleOwner: LifecycleOwner): DialogFragment() {
+class BulletEditMenu(val bullet: Bullet, private val lifecycleOwner: LifecycleOwner) :
+    DialogFragment() {
 
     var bulletType: BulletType = bullet.bulletType
     var bulletText: String = bullet.message
@@ -45,12 +48,30 @@ class BulletEditMenu(val bullet: Bullet, private val lifecycleOwner: LifecycleOw
             messageView = view.findViewById(R.id.edit_txt_bullet)
             messageView.setText(bullet.message)
             typeView = view.findViewById(R.id.edit_bullet_type)
-            typeView.setImageResource(when (bullet.bulletType){
-                BulletType.NOTE -> R.drawable.bullet_icon_note
-                BulletType.INCOMPLETETASK -> R.drawable.bullet_icon_task
-                BulletType.COMPLETETASK -> R.drawable.bullet_icon_complete
-                BulletType.EVENT -> R.drawable.bullet_icon_event
-            })
+            typeView.setImageResource(
+                when (bullet.bulletType) {
+                    BulletType.NOTE -> R.drawable.bullet_icon_note
+                    BulletType.INCOMPLETETASK -> R.drawable.bullet_icon_task
+                    BulletType.COMPLETETASK -> R.drawable.bullet_icon_complete
+                    BulletType.EVENT -> R.drawable.bullet_icon_event
+                }
+            )
+
+            //Enterkey closes the dialog
+            messageView.setOnKeyListener { _, keyCode, event ->
+                Log.i("BulletAdapter", "Pressed")
+                when {
+                    ((keyCode == KeyEvent.KEYCODE_ENTER) && (event.action == KeyEvent.ACTION_DOWN)) -> {
+                        Log.i("BulletAdapter", "Enter key pressed")
+                        val imm =
+                            messageView.context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        imm.hideSoftInputFromWindow(messageView.windowToken, 0)
+                        dismiss()
+                        return@setOnKeyListener true
+                    }
+                    else -> false
+                }
+            }
 
             //Sets up button listeners
             typeView.setOnClickListener {
@@ -64,7 +85,7 @@ class BulletEditMenu(val bullet: Bullet, private val lifecycleOwner: LifecycleOw
                 this.dismiss()
             }
             //If the user clicks the cancel button
-            view.findViewById<ImageButton>(R.id.edit_cancel).setOnClickListener{
+            view.findViewById<ImageButton>(R.id.edit_cancel).setOnClickListener {
                 isEdit = false
                 messageView.setText(bullet.message)
                 this.dismiss()

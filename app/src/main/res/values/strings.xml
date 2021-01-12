@@ -1,9 +1,19 @@
 <resources>
+    <!-- Main Activity -->
     <string name="app_name">ProjectBullet</string>
-    <string name="hello_blank_fragment">This is the home page</string>
     <string name="footer">Developed by Sam Newby</string>
-    <string name="go_back_a_day">Go Back a day</string>
+
+    <!-- Daily Fragment -->
+    <string name="daily_title">Daily</string>
+    <string name="btn_day_forward">Go forwards one day</string>
+    <string name="btn_day_back">Go backwards one day</string>
+    <string name="btn_create_bullet">Create a new bullet</string>
+    <string name="btn_bullet_type">Change type of new bullet</string>
+    <string name="btn_home">Change the date to today</string>
+    <string name="btn_sort">Sort bullets</string>
+
     <string name="menu_daily">Daily</string>
+    <string name="hello_blank_fragment">This is the home page</string>
     <string name="menu_about">About</string>
     <string name="hint_new_bullet">Add new bullet</string>
     <string name="btn_cancel">Cancel</string>
