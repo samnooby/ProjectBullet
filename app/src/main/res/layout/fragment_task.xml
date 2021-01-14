@@ -5,12 +5,12 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".DailyFragment">
+        tools:context=".TaskFragment">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="This is the daily fragment" />
+            android:text="This is the task fragment" />
 
     </FrameLayout>
 </layout>

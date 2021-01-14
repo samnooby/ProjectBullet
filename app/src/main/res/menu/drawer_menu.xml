@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/dailyFragment"
+        android:title="@string/daily" />
+    <item
+        android:id="@+id/tagFragment"
+        android:title="@string/tags" />
+    <item
+        android:id="@+id/taskFragment"
+        android:title="@string/tasks" />
+</menu>

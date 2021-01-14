@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
+    <!--Theme dependent colors-->
+    <color name="Primary">#ff5a54</color>
+    <color name="PrimaryVariant">#bf433f</color>
+    <color name="colorOnPrimary">#faebd2</color>
+    <color name="TitleColor">#423824</color>
+
+    <!--Dark theme colors-->
+    <color name="darkTextColor">#423824</color>
+    <color name="darkBackground">#ccc4c4</color>
+
+    <!--Light theme color-->
+    <color name="lightTextColor">#423824</color>
+    <color name="lightBackground">#f7faff</color>
+
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
-    <color name="black">#000000</color>
+    <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="primary">#ff5a54</color>
-    <color name="text_color_primary">#423824</color>
-    <color name="text_hint_primary">#c2cacc</color>
-    <color name="background_primary">#f7faff</color>
-    <color name="background_text">#ebeef2</color>
-    <color name="background_bullets">#fffff5</color>
-    <color name="background_notes">#fafaf0</color>
 </resources>
