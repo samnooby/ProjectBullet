@@ -4,8 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import java.time.LocalDate
 
+interface Daos
+
 @Dao
-interface DayDao {
+interface DayDao: Daos {
     //DayDao is used to update the days table in the database
 
     //Get days between startDate and endDate
@@ -20,7 +22,7 @@ interface DayDao {
 }
 
 @Dao
-interface BulletDao {
+interface BulletDao: Daos {
     //BulletDao is used to update the bullets table in the database
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -38,7 +40,7 @@ interface BulletDao {
 }
 
 @Dao
-interface TagDao {
+interface TagDao: Daos {
     //TagDao is used to update the tags and tag relationship table in the database
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTag(tag: Tag)

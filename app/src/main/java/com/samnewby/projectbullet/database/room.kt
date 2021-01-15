@@ -19,20 +19,26 @@ abstract class BulletsDatabase : RoomDatabase() {
     abstract val tagDao: TagDao
 
     //Singleton instance
-    private lateinit var INSTANCE: BulletsDatabase
 
     //Returns the singleton instance or create one if one does not exist
-    fun getDatabase(context: Context): BulletsDatabase {
-        synchronized(BulletsDatabase::class.java) {
-            //If instance class is not initialized
-            if (!::INSTANCE.isInitialized) {
-                INSTANCE = Room.databaseBuilder(
-                    context.applicationContext,
-                    BulletsDatabase::class.java,
-                    "bullets"
-                ).build()
+    companion object {
+
+        @Volatile
+        private var INSTANCE: BulletsDatabase? = null
+
+        fun getDatabase(context: Context): BulletsDatabase {
+            synchronized(BulletsDatabase::class.java) {
+                var instance = INSTANCE
+                if (instance == null) {
+                    instance = Room.databaseBuilder(
+                        context.applicationContext,
+                        BulletsDatabase::class.java,
+                        "bullets_database"
+                    ).fallbackToDestructiveMigration().build()
+                    INSTANCE = instance
+                }
+                return instance
             }
-            return INSTANCE
         }
     }
 }
