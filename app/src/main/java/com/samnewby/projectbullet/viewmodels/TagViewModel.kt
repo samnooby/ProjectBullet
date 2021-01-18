@@ -1,4 +1,4 @@
-package com.samnewby.projectbullet.tag
+package com.samnewby.projectbullet.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

@@ -4,7 +4,7 @@
 <FrameLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".TagFragment">
+    tools:context=".fragments.TagFragment">
 
     <TextView
         android:layout_width="match_parent"

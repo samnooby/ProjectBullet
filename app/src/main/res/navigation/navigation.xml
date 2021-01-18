@@ -6,11 +6,11 @@
 
     <fragment
         android:id="@+id/dailyFragment"
-        android:name="com.samnewby.projectbullet.DailyFragment" />
+        android:name="com.samnewby.projectbullet.fragments.DailyFragment" />
     <fragment
         android:id="@+id/tagFragment"
-        android:name="com.samnewby.projectbullet.TagFragment" />
+        android:name="com.samnewby.projectbullet.fragments.TagFragment" />
     <fragment
         android:id="@+id/taskFragment"
-        android:name="com.samnewby.projectbullet.TaskFragment" />
+        android:name="com.samnewby.projectbullet.fragments.TaskFragment" />
 </navigation>

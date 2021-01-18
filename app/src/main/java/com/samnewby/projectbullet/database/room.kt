@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
 @Database(
-    entities = [Bullet::class, Day::class, Tag::class, BulletTagCrossRef::class],
+    entities = [DatabaseBullet::class, DatabaseDay::class, DatabaseTag::class, BulletTagCrossRef::class],
     version = 1,
     exportSchema = false
 )

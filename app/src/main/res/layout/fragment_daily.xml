@@ -5,13 +5,13 @@
     <data>
         <variable
             name="dailyViewModel"
-            type="com.samnewby.projectbullet.daily.DailyViewModel" />
+            type="com.samnewby.projectbullet.viewmodels.DailyViewModel" />
     </data>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".DailyFragment">
+        tools:context=".fragments.DailyFragment">
 
         <TextView
             android:layout_width="match_parent"

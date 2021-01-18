@@ -11,14 +11,19 @@ interface DayDao: Daos {
     //DayDao is used to update the days table in the database
 
     //Get days between startDate and endDate
+    @Transaction
     @Query("select * from days WHERE date BETWEEN :startDate AND :endDate ORDER BY date ASC")
-    fun getDays(startDate: LocalDate, endDate: LocalDate): LiveData<List<DayWithBulletsAndTags>>
+    fun getDays(startDate: LocalDate, endDate: LocalDate): List<DayWithBulletsAndTags>
+
+    @Transaction
+    @Query("select * from days where date = :date")
+    fun getDay(date: LocalDate): DayWithBulletsAndTags
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertDay(day: Day)
+    fun insertDay(databaseDay: DatabaseDay)
 
     @Delete
-    fun deleteDay(day: Day)
+    fun deleteDay(databaseDay: DatabaseDay)
 }
 
 @Dao
@@ -26,37 +31,39 @@ interface BulletDao: Daos {
     //BulletDao is used to update the bullets table in the database
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertBullet(bullet: Bullet)
+    fun insertBullet(databaseBullet: DatabaseBullet)
 
     //Get the bullets for a certain day
+    @Transaction
     @Query("select * from bullets WHERE day = :day")
-    fun getBullets(day: LocalDate): LiveData<List<BulletWithTags>>
+    fun getBullets(day: LocalDate): List<BulletWithTags>
 
     @Update
-    fun updateBullet(bullet: Bullet)
+    fun updateBullet(databaseBullet: DatabaseBullet)
 
     @Delete
-    fun deleteBullet(bullet: Bullet)
+    fun deleteBullet(databaseBullet: DatabaseBullet)
 }
 
 @Dao
 interface TagDao: Daos {
     //TagDao is used to update the tags and tag relationship table in the database
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertTag(tag: Tag)
+    fun insertTag(databaseTag: DatabaseTag)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertBulletTagRelation(crossRef: BulletTagCrossRef)
 
+    @Transaction
     @Query("SELECT * FROM tags")
-    fun getAllTags(): LiveData<List<TagWithBullets>>
+    fun getAllTags(): List<TagWithBullets>
 
     @Update
-    fun updateTag(tag: Tag)
+    fun updateTag(databaseTag: DatabaseTag)
 
     @Delete
     fun deleteBulletTagRelation(crossRef: BulletTagCrossRef)
 
     @Delete
-    fun deleteTag(tag: Tag)
+    fun deleteTag(databaseTag: DatabaseTag)
 }

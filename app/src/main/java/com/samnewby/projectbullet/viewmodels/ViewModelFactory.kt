@@ -1,14 +1,11 @@
-package com.samnewby.projectbullet
+package com.samnewby.projectbullet.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.samnewby.projectbullet.daily.DailyViewModel
 import com.samnewby.projectbullet.database.BulletDao
-import com.samnewby.projectbullet.database.Daos
 import com.samnewby.projectbullet.database.DayDao
 import com.samnewby.projectbullet.database.TagDao
-import com.samnewby.projectbullet.tag.TagViewModel
 import java.lang.IllegalArgumentException
 
 //Creates a new view model with the given datasource and application, allows for multiple viewmodels
@@ -20,10 +17,18 @@ class BulletViewModelFactory(
     private val dayAccess: DayDao? = null) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(DailyViewModel::class.java)) {
-            return DailyViewModel(dayAccess!!, bulletAccess, application) as T
+            return DailyViewModel(
+                dayAccess!!,
+                bulletAccess,
+                application
+            ) as T
         }
         if (modelClass.isAssignableFrom(TagViewModel::class.java)) {
-            return TagViewModel(tagAccess!!, bulletAccess, application) as T
+            return TagViewModel(
+                tagAccess!!,
+                bulletAccess,
+                application
+            ) as T
         }
 
         throw IllegalArgumentException("Unknown View Model class")
