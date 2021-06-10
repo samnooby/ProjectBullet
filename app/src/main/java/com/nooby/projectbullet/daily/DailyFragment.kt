@@ -57,6 +57,16 @@ class DailyFragment : Fragment(), BulletEditMenu.EditListener, BulletNoteEditMen
         //Sets up click and keyboard listeners
         setupEventListeners(dailyViewModel)
 
+        //Sets up to change to a loading screen when loading days from the database
+        dailyViewModel.isLoading.observe(viewLifecycleOwner, Observer {
+            Log.i("DailyFragment", "Switching visibility")
+            if (it) {
+                binding.loading.visibility = View.VISIBLE
+            } else {
+                binding.loading.visibility = View.GONE
+            }
+        })
+
         Log.i("DailyFragment", "DailyFragment created")
 
         return binding.root

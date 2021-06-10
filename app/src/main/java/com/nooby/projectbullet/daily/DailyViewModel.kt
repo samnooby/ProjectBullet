@@ -37,6 +37,8 @@ class DailyViewModel(
 
     var newBulletType = BulletType.NOTE
 
+    var isLoading = MutableLiveData<Boolean>(false)
+
     init {
         getDays(0)
     }
@@ -51,6 +53,7 @@ class DailyViewModel(
     ) {
         uiScope.launch {
             Log.i("DailyViewModel", "Changing week to $numPages")
+            isLoading.value = true
             //Sets the new current day if any was passed in
             if (newCurrentDay != null) {
                 currentDay = newCurrentDay
@@ -91,6 +94,8 @@ class DailyViewModel(
             Log.i("DailyViewModel", "Start is $dayStart, end is $dayEnd")
 
             currentDays.value = daysList
+
+            isLoading.value = false
         }
     }
 
