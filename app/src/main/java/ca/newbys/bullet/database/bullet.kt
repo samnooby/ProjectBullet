@@ -1,8 +1,8 @@
 package ca.newbys.bullet.database
 
 import androidx.room.*
+import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 
 //The different type of bullets
@@ -18,7 +18,7 @@ data class Bullet(
 
     @ColumnInfo(name = "name") var name: String,
     @ColumnInfo(name = "description") var description: String?,
-    @ColumnInfo(name = "bullet_date") var bulletDate: LocalDateTime = LocalDateTime.now(),
+    @ColumnInfo(name = "bullet_date") var bulletDate: LocalDate = LocalDate.now(),
     @ColumnInfo(name = "bullet_type") var bulletType: BulletType = BulletType.NOTE,
     @ColumnInfo(name = "bullet_notes") var bulletNotes: List<String> = listOf()
 )

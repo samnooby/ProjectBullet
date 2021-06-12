@@ -32,7 +32,7 @@ class DailyViewModel(private val database: BulletDao) : ViewModel() {
             val currentDays = database.getAllDays()
             currentDays.forEach {
                 it.bullets.value =
-                    database.getBullets(it.date.atStartOfDay(), it.date.atTime(11, 59))
+                    database.getBullets(it.date)
             }
             Days.value = currentDays
         }

@@ -1,6 +1,7 @@
 package ca.newbys.bullet.database
 
 import androidx.room.*
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Dao
@@ -15,8 +16,8 @@ interface BulletDao {
     fun delete(bullet: Bullet)
 
     @Transaction
-    @Query("SELECT * FROM bullets WHERE bullet_date BETWEEN :start_day AND :end_day")
-    fun getBullets(start_day: LocalDateTime, end_day: LocalDateTime): List<Bullet>
+    @Query("SELECT * FROM bullets WHERE bullet_date = :date")
+    fun getBullets(date: LocalDate): List<Bullet>
 
     @Query("SELECT * FROM bullets")
     fun getAllBullets(): List<Bullet>
