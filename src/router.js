@@ -8,6 +8,8 @@ Vue.use(VueRouter)
 export default new VueRouter({
     routes: [
         {path: '/', name: 'Home', component: () => import(/* webpackChunkName: "home" */ './pages/Home.vue')},
-        {path: '/create', name: 'CreateCollection', component: () => import(/* webpackChunkName: "createcollection" */ './pages/CreateCollection.vue')}
+        {path: '/create', name: 'CreateCollection', component: () => import(/* webpackChunkName: "createcollection" */ './pages/CreateCollection.vue')},
+        {path: '/404', name: 'NotFound', component: () => import(/* webpackChunkName: "notfound" */ './pages/NotFound.vue')},
+        {path: '/*', redirect: { name: 'NotFound' }}
     ]
 })
