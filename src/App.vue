@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <v-app>
       <h1>Welcome to project bullet</h1>
       <router-view></router-view>
-  </div>
+  </v-app>
 </template>
 
 <script>
