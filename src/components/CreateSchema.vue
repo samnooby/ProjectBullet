@@ -6,6 +6,7 @@
       </v-col>
     </v-row>
     <v-row class="row mb-1" v-for="row in rows" :key="row.id">
+      <v-col cols="1"></v-col>
       <v-col
         class="column"
         v-for="column in row.columns"
@@ -13,7 +14,7 @@
         :cols="column.size"
         @click="editColumn(row, column)"
       >
-        {{ column.name }}
+        {{ column.title }}
       </v-col>
       <v-col class="add" v-if="row.free_space > 0" :cols="row.free_space">
         <v-btn id="create-column" icon @click="createColumn(row.id)">
@@ -34,7 +35,7 @@
         <v-card-text>
           <v-row v-if="current_column && current_row">
             <v-col sm="6" cols="12">
-              <v-text-field v-model="current_column.name"></v-text-field>
+              <v-text-field v-model="current_column.title"></v-text-field>
             </v-col>
             <v-col sm="6" cols="12">
               <v-select
@@ -64,7 +65,7 @@
 </template>
 
 <script>
-const DEFAULT_ROW_SIZE = 12;
+const DEFAULT_ROW_SIZE = 10;
 
 export default {
   data() {
@@ -100,7 +101,7 @@ export default {
         id: this.current_id,
         type: "Text",
         size: row.free_space,
-        name: "column",
+        title: "column",
       };
       this.current_id++;
       this.num_columns ++
@@ -128,9 +129,9 @@ export default {
           this.current_row.free_space +
           this.old_size -
           this.current_column.size;
-        //Gets rid of the name if it is a blank type
+        //Gets rid of the title if it is a blank type
         if (this.current_column.type == "Blank") {
-          this.current_column.name = "";
+          this.current_column.title = "";
         }
         //Reset the current row and column
         this.current_column = null;

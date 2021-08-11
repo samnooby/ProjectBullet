@@ -24,6 +24,8 @@ class Collection {
 
 class Row {
     constructor(free_space, columns) {
+        this.id = current_id
+        current_id ++
         this.free_space = free_space
         this.columns = []
         //Converts the columns into their correct column class
@@ -36,6 +38,8 @@ class Row {
 //This is an abstract class, Do not use
 class Column {
     constructor(title, size, type) {
+        this.id = current_id
+        current_id ++
         this.title = title
         this.size = size
         this.type = type
@@ -46,7 +50,7 @@ class Column {
 export default new Vuex.Store({
     state: {
         collections: [
-            new Collection("Test", "Description", [ {id: 0, free_space: 0, columns: [ { id: 1, type: 'Text', size: 12, name: 'tester'}]} ])
+            new Collection("Test", "Description", [ {id: 0, free_space: 0, columns: [ { id: 1, type: 'Text', size: 10, title: 'tester'}]} ])
         ]
     },
     mutations: {
