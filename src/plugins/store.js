@@ -9,11 +9,14 @@ var current_id = 0
 class Collection {
     constructor(title, description, schema) {
         //Sets parameters
+        this.id = current_id
+        current_id++
         this.title = title
         this.description = description
         this.schema = []
+        this.entries = []
         //Converts object into row class
-        for (var i = 0; i < schema.length; i ++) {
+        for (var i = 0; i < schema.length; i++) {
             this.schema.push(new Row(schema[i].free_space, schema[i].columns))
         }
     }
@@ -24,7 +27,7 @@ class Row {
         this.free_space = free_space
         this.columns = []
         //Converts the columns into their correct column class
-        for (var i = 0; i < columns.length; i ++) {
+        for (var i = 0; i < columns.length; i++) {
             this.columns.push(new Column(columns[i].title, columns[i].size, columns[i].type))
         }
     }
@@ -42,10 +45,12 @@ class Column {
 //The store that holds the application data
 export default new Vuex.Store({
     state: {
-        collections: []
+        collections: [
+            new Collection("Test", "Description", [ {id: 0, free_space: 0, columns: [ { id: 1, type: 'Text', size: 12, name: 'tester'}]} ])
+        ]
     },
     mutations: {
-        CREATE_COLLECTION (state, collection) {
+        CREATE_COLLECTION(state, collection) {
             //Converts the object to an actual collection object and pushes to list
             var new_collection = new Collection(collection.title, collection.description, collection.schema)
             state.collections.push(new_collection)
@@ -59,5 +64,10 @@ export default new Vuex.Store({
             commit('CREATE_COLLECTION', collection)
         }
     },
-    getters: {}
+    getters: {
+        //Gets the collection with the given id
+        getCollectionById: (state) => (id) => {
+            return state.collections.find(collection => collection.id === id)
+        }
+    }
 })
