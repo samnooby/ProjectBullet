@@ -85,6 +85,7 @@ export default {
         this.dialog = true;
       } else {
         //TODO: CREATE THE COLLECTION IN VUEX
+        this.$store.dispatch('createCollection', { title: this.title, description: this.description, schema: rows})
         this.$router.push({ name: "Home" });
       }
     },
