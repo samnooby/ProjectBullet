@@ -1,0 +1,44 @@
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS collections;
+DROP TABLE IF EXISTS collection_rows;
+DROP TABLE IF EXISTS collection_columns;
+
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE collections (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE TABLE collection_rows (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    collection_id INTEGER NOT NULL,
+
+    free_space INTEGER NOT NULL,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (collection_id) REFERENCES collections (id)
+);
+
+CREATE TABLE collection_columns (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    row_id INTEGER NOT NULL,
+
+    size INTEGER NOT NULL,
+    type TEXT NOT NULL,
+    is_required BOOLEAN NOT NULL,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (row_id) REFERENCES collection_rows (id)
+);
