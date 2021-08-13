@@ -43,6 +43,7 @@ class Column {
         this.title = title
         this.size = size
         this.type = type
+        this.items = ['one', 'two', 'three']
     }
 }
 
@@ -50,7 +51,10 @@ class Column {
 export default new Vuex.Store({
     state: {
         collections: [
-            new Collection("Test", "Description", [ {id: 0, free_space: 0, columns: [ { id: 1, type: 'Text', size: 10, title: 'tester'}]} ])
+            new Collection("Test", "Description", [ 
+            { free_space: 0, columns: [ { type: 'Checkbox', size: 2, title: 'test'}, { type: 'Text', size: 10, title: 'tester'}]},
+            { free_space: 0, columns: [ { type: 'Blank', size: 2, title: ''}, { type: 'Dropdown', size: 2, title: 'NoteType'}, { type: 'Text', size: 8, title: 'Note'}]}
+        ])
         ]
     },
     mutations: {

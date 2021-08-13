@@ -6,7 +6,7 @@
       </v-col>
     </v-row>
     <v-row class="row mb-1" v-for="row in rows" :key="row.id">
-      <v-col cols="1"></v-col>
+      <!-- <v-col cols="1"></v-col> -->
       <v-col
         class="column"
         v-for="column in row.columns"
@@ -65,7 +65,7 @@
 </template>
 
 <script>
-const DEFAULT_ROW_SIZE = 10;
+const DEFAULT_ROW_SIZE = 12;
 
 export default {
   data() {
