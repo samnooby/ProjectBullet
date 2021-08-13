@@ -9,7 +9,7 @@
           <h3>Add entry</h3>
       </v-col>
       <v-col cols="12">
-        <CreateEntry v-bind:schema="collection.schema" />
+        <CreateEntry v-bind:schema="collection.schema" v-on:createCollectionEntry="createCollectionEntry"/>
       </v-col>
     </v-row>
     <v-row v-for="entry in collection.entries" :key="entry.id">
@@ -32,6 +32,12 @@ export default {
     return {
       collection: null,
     };
+  },
+  methods: {
+    //createCollectionEntry tells the vuex store to create a new entry to the collection with given values
+    createCollectionEntry(entry) {
+      this.$store.dispatch('createEntry', { collection_id: this.collection.id, entry: entry})
+    }
   },
   mounted() {
     var current_collection = this.getCollectionById(this.$route.params.id);

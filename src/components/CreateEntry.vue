@@ -39,7 +39,7 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-btn>Create Entry</v-btn>
+      <v-btn @click="createEntry">Create Entry</v-btn>
     </v-row>
   </v-container>
 </template>
@@ -53,6 +53,12 @@ export default {
     return {
       prototype: {},
     };
+  },
+  methods: {
+    createEntry() {
+      this.$emit('createCollectionEntry', this.prototype)
+      this.prototype = {}
+    }
   },
 };
 </script>
