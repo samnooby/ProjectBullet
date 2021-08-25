@@ -23,10 +23,18 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    #TODO: Set up app routes
+    # Adds the routes to the app
+    from . import home
+    app.register_blueprint(home.bp)
+    app.add_url_rule('/', endpoint='index')
+
     from . import auth
     app.register_blueprint(auth.bp)
 
+    from . import collection
+    app.register_blueprint(collection.bp)
+
+    # Sets up the database
     from . import db
     db.init_app(app)
 

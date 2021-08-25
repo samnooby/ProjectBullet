@@ -52,6 +52,9 @@ def login():
                 flash('Incorrect username or password')
                 return render_template('auth/login.html')
 
+            session.clear()
+            session['user_id'] = user.id
+
             return redirect(url_for('index'))
 
 
@@ -67,13 +70,15 @@ def logout():
 def load_logged_in_user():
     # Checks if there is a user in the current session
     user_id = session.get('user_id')
+    print(f'Got { user_id } from session')
 
     # Adds the user to the request if they are logged in
     if user_id is None:
         g.user = None
     else:
         with get_db() as db:
-            db.session.query(User).get(user_id)
+            user = db.session.query(User).get(user_id)
+        g.user = user
 
 # When added to a route it ensures that the user is currently logged in
 def login_required(view):

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}Index{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+{% for collection in collections %}
+<article class="collection">
+    <header>
+        <div>
+            <h1>{{ collection.title }}</h1>
+            <div>Created on {{ collection.created.strftime('%Y-%m-%d') }}</div>
+            <div>{{ collection.description }}</div>
+        </div>
+    </header>
+    {% if not loop.last %}
+    <hr>
+    {% endif %}
+    {% endfor %}
+</article>
+{% endblock %}

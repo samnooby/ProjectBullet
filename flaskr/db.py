@@ -1,10 +1,13 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
+
+from flask import current_app, g
+from flask.cli import with_appcontext
+
+from datetime import datetime
 
 import json
 import click
-from flask import current_app, g
-from flask.cli import with_appcontext
 
 Base = declarative_base()
 
@@ -14,8 +17,9 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String(32), nullable=False, unique=True)
     password = Column(String(128), nullable=False)
+    created = Column(DateTime, nullable=False, default=datetime.now())
 
-    collections = relationship('Collection', back_populates='user')
+    collections = relationship('Collection', back_populates='user', lazy="joined")
 
 class Collection(Base):
     __tablename__ = 'user_collection'
@@ -24,6 +28,7 @@ class Collection(Base):
     title = Column(String(32), nullable=False)
     description = Column(String(128))
     schema = Column(String(512))
+    created = Column(DateTime, nullable=False, default=datetime.now())
 
     user_id = Column(Integer, ForeignKey("user_account.id"))
     user = relationship("User", back_populates="collections")
@@ -35,6 +40,7 @@ class Entry(Base):
 
     id = Column(Integer, primary_key=True)
     data = Column(String(512), nullable=False)
+    created = Column(DateTime, nullable=False, default=datetime.now())
 
     collection_id = Column(Integer, ForeignKey("user_collection.id"))
     collection = relationship("Collection", back_populates="entries")
@@ -47,7 +53,7 @@ class SQLConnection(object):
     
     def __enter__(self):
         engine = create_engine(self.connection_string, echo=True, future=True)
-        Session = sessionmaker()
+        Session = sessionmaker(expire_on_commit=False)
         self.session = Session(bind=engine)
         return self
     

@@ -6,10 +6,13 @@
     <ul>
         {% if g.user %}
             <li>
-                <span>{{ g.user['username'] }}</span>
+                <span>{{ g.user.username }}</span>
             </li>
             <li>
                 <a href="{{ url_for('auth.logout') }}">Log out</a>
+            </li>
+            <li>
+                <a href="{{ url_for('collection.index') }}">Collections</a>
             </li>
         {% else %}
             <li><a href="{{ url_for('auth.register') }}">Register</a></li>
@@ -26,3 +29,7 @@
     {% endfor %}
     {% block content %}{% endblock %}
 </section>
+
+<script>
+    console.log("This is a test")
+</script>
